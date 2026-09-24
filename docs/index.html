@@ -189,10 +189,12 @@
 
   <div class="screen">
     <video id="heroVideo" autoplay muted loop playsinline preload="auto" disablepictureinpicture
-           poster="assets/video_poster.jpg?v=2" src="assets/flythrough_HQ_enhanced.mp4?v=2"></video>
-    <span class="badge"><i></i>高质量渲染 · flythrough（held-out PSNR 27.57 / Laplacian 22.45）· 点击暂停/播放</span>
+           poster="assets/video_poster.jpg?v=3" src="assets/flythrough_fullseq.mp4?v=1"></video>
+    <span class="badge"><i></i>全序列飞越 · 1017 帧（定稿配方模型沿完整采集轨迹渲染）· 点击暂停/播放</span>
   </div>
-  <p class="cap">渲染自本项目的离线高质量参照——在线管线与它的完整质量账见
+  <p class="cap"><b>全序列飞越</b>：定稿配方（光度一致全帧位姿 + 双输出联合 init）训练的模型，
+  沿完整采集轨迹逐帧渲染——1017 帧无跳步，从入水到收尾一遍看完。
+  在线管线与离线配方的完整质量账见
   <a href="#ledger">在线 vs 离线账本</a>。</p>
 </div></header>
 
