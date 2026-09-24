@@ -107,6 +107,15 @@
   figure img{display:block;width:100%;border-radius:10px;background:#02090e}
   figcaption{font-size:13px;color:var(--sub);padding:13px 8px 5px;line-height:1.7}
   figcaption b{color:var(--ink)}
+  /* 逐帧网格 */
+  .fgrid{display:grid;gap:10px}
+  .fgrid img{border-radius:9px;border:1px solid var(--hair2)}
+  .fgrid .cell b{display:block;font-size:12px;color:var(--sub);margin-top:7px;font-weight:600;letter-spacing:.2px;line-height:1.5}
+  .fgrid .cell b i{color:var(--faint);font-style:normal;font-weight:400}
+  .f5{grid-template-columns:repeat(5,1fr)}
+  .f4{grid-template-columns:repeat(4,1fr)}
+  .f3{grid-template-columns:repeat(3,1fr)}
+  @media (max-width:760px){ .f5,.f4{grid-template-columns:repeat(2,1fr)} .f3{grid-template-columns:repeat(2,1fr)} }
 
   /* 流程 */
   .flow{background:rgba(2,12,18,.65);border:1px solid var(--cardline);color:#bfe6ef;border-radius:16px;
@@ -291,17 +300,37 @@
     </table>
     <p class="cap">预算 = 质量-时间旋钮：在 0.038–0.337 之间随取随停；"换在线位姿"行说明位姿等级在低预算下无关紧要、预算解锁后才成为天花板。早停行是教训 ⑥ 的实测。</p>
     <figure class="reveal">
-      <img src="assets/video_budget_ladder_coral.gif" alt="coral 预算阶梯渲染对比动图">
-      <figcaption>同一帧在不同预算下的渲染演化（最小预算 → 推荐档 → 高预算 vs 离线上限）。</figcaption>
+      <div class="fgrid f5">
+        <div class="cell"><img src="assets/frames/ladder_c0.jpg" alt="最小预算渲染"><b>最小预算 6.8k<br><i>ret 0.038 · 26.03 dB · 370 s</i></b></div>
+        <div class="cell"><img src="assets/frames/ladder_a3.jpg" alt="在线推荐档渲染"><b>在线推荐档 20.4k<br><i>ret 0.243 · 26.16 dB · ~890 s</i></b></div>
+        <div class="cell"><img src="assets/frames/ladder_a6.jpg" alt="高预算档渲染"><b>高预算档 40.8k<br><i>ret 0.337 · 25.26 dB · 1530 s</i></b></div>
+        <div class="cell"><img src="assets/frames/ladder_ref.jpg" alt="batch 上限渲染"><b>batch 上限 30k<br><i>ret 0.426 · 26.46 dB · 1186 s</i></b></div>
+        <div class="cell"><img src="assets/frames/ladder_gt.jpg" alt="真值"><b>GT 真值参照</b></div>
+      </div>
+      <figcaption><b>预算阶梯 · 同一 held-out 视图（canonical 渲染）</b>：预算从 6.8k 提到 40.8k，
+      细节密度单调上升，batch 上限仍最高——"预算即画质旋钮"的直接可视化。</figcaption>
     </figure>
     <figure class="reveal">
-      <img src="assets/video_time_evolution_Ax6_coral.gif" alt="建图时间演化动图">
-      <figcaption>增量建图随时间推进的渲染演化——"采集即建"的直观形态。</figcaption>
+      <div class="fgrid f3">
+        <div class="cell"><img src="assets/frames/evo_ck01.jpg" alt="1.2k iters 渲染"><b>ck01 · 1.2k iters · t ≈ 53 s</b></div>
+        <div class="cell"><img src="assets/frames/evo_ck04.jpg" alt="4.8k iters 渲染"><b>ck04 · 4.8k iters · t ≈ 214 s</b></div>
+        <div class="cell"><img src="assets/frames/evo_ck07.jpg" alt="8.4k iters 渲染"><b>ck07 · 8.4k iters · t ≈ 376 s</b></div>
+        <div class="cell"><img src="assets/frames/evo_ck13.jpg" alt="15.6k iters 渲染"><b>ck13 · 15.6k iters · t ≈ 698 s</b></div>
+        <div class="cell"><img src="assets/frames/evo_ck17.jpg" alt="20.4k iters 渲染"><b>ck17 · 20.4k iters · t ≈ 891 s</b></div>
+        <div class="cell"><img src="assets/frames/evo_gt.jpg" alt="真值"><b>GT 真值参照</b></div>
+      </div>
+      <figcaption><b>增量建图演化 · 同一 held-out 视图（canonical A3，代表性检查点）</b>：
+      采集开始 1 分钟只有朦胧结构，随 chunk 推进细节逐步长出，15 分钟收尾——"采集即建、边走边长"的直观形态。</figcaption>
     </figure>
     <figure class="reveal">
-      <img src="assets/video_budget_ladder_aqualoc.gif" alt="AQUALOC 预算阶梯动图">
-      <figcaption><b>跨场景复现</b>：AQUALOC（441 帧）预算-响应形态一致：retention
-        0.141→0.220→0.337，PSNR_u8 19.0→34.5，T@0.15 = 354 s——结论不依赖单一场景。</figcaption>
+      <div class="fgrid f4">
+        <div class="cell"><img src="assets/frames/aqualoc_01.jpg" alt="AQUALOC 6k 渲染"><b>6k iters · ~4 min<br><i>ret 0.141</i></b></div>
+        <div class="cell"><img src="assets/frames/aqualoc_02.jpg" alt="AQUALOC 18k 渲染"><b>18k iters · ~9 min<br><i>ret 0.220</i></b></div>
+        <div class="cell"><img src="assets/frames/aqualoc_03.jpg" alt="AQUALOC 30k 上限渲染"><b>30k 上限 · ~16 min<br><i>ret 0.337</i></b></div>
+        <div class="cell"><img src="assets/frames/aqualoc_04.jpg" alt="AQUALOC 真值"><b>GT 真值参照</b></div>
+      </div>
+      <figcaption><b>跨场景复现（AQUALOC，441 帧）</b>：预算-响应形态与 coral 一致：
+      ret 0.141→0.220→0.337，PSNR_u8 19.0→34.5，T@0.15 = 354 s——结论不依赖单一场景。</figcaption>
     </figure>
   </section>
 
