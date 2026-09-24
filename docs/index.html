@@ -53,7 +53,7 @@
   .screen{position:relative;border-radius:20px;overflow:hidden;
           border:1px solid rgba(255,255,255,.13);
           box-shadow:0 40px 90px rgba(0,0,0,.55), 0 0 0 1px rgba(53,208,232,.10), 0 0 140px rgba(53,208,232,.10)}
-  .screen video{display:block;width:100%;aspect-ratio:968/608;object-fit:cover;background:#02090e}
+  .screen video{display:block;width:100%;aspect-ratio:968/608;object-fit:cover;background:#02090e;cursor:pointer}
   .screen .badge{position:absolute;left:18px;bottom:16px;font-size:12px;color:#dff6fb;
           background:rgba(4,18,27,.72);backdrop-filter:blur(6px);border:1px solid var(--hair);
           border-radius:999px;padding:6px 14px;letter-spacing:.3px}
@@ -181,9 +181,9 @@
   </div>
 
   <div class="screen">
-    <video autoplay muted loop playsinline preload="auto"
+    <video id="heroVideo" autoplay muted loop playsinline preload="auto" disablepictureinpicture
            poster="assets/video_poster.jpg" src="assets/flythrough_HQ_enhanced.mp4"></video>
-    <span class="badge"><i></i>高质量渲染 · flythrough（held-out PSNR 27.57 / Laplacian 22.45）</span>
+    <span class="badge"><i></i>高质量渲染 · flythrough（held-out PSNR 27.57 / Laplacian 22.45）· 点击暂停/播放</span>
   </div>
   <p class="cap">渲染自本项目的离线高质量参照——在线管线与它的完整质量账见
   <a href="#ledger">在线 vs 离线账本</a>。</p>
@@ -446,6 +446,8 @@
 <script>
   const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.08});
   document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+  const hv=document.getElementById('heroVideo');
+  hv.addEventListener('click',()=>hv.paused?hv.play():hv.pause());
 </script>
 </body>
 </html>
