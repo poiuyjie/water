@@ -6,106 +6,151 @@
 <title>水下 3DGS 建图 · Time-to-Map</title>
 <style>
   :root{
-    --ink:#1c2430; --dim:#5b6b7b; --faint:#8a99a8;
-    --paper:#f7f9fa; --card:#ffffff; --line:#dde5ea; --hairline:#e9eef2;
-    --accent:#0e7c9c; --accent-strong:#0a5d75; --glow:#31c4d8;
-    --ok:#0f7b4d; --okbg:#e9f6ef; --bad:#b3382e; --badbg:#fbeced;
-    --amberbg:#fff7dd; --amberline:#d9b23a; --navy:#071c28;
+    --bg0:#04121b; --bg1:#07202e; --ink:#e9f3f7; --sub:#a7bcc9; --faint:#71889a;
+    --cyan:#35d0e8; --cyan2:#8ae9f6; --purple:#a78bfa;
+    --hair:rgba(255,255,255,.08); --hair2:rgba(255,255,255,.05);
+    --card:rgba(255,255,255,.035); --cardline:rgba(255,255,255,.09);
+    --ok:#5eead4; --okbg:rgba(94,234,212,.07); --bad:#fda4af; --badbg:rgba(253,164,175,.06);
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);
+  html{scroll-behavior:smooth}
+  body{margin:0;color:var(--ink);
        font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Helvetica,Arial,sans-serif;
-       line-height:1.75;font-variant-numeric:tabular-nums}
-  .wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+       line-height:1.8;font-variant-numeric:tabular-nums;
+       background:radial-gradient(1200px 700px at 85% -8%, rgba(53,208,232,.10), transparent 55%),
+                  radial-gradient(900px 600px at -12% 30%, rgba(167,139,250,.07), transparent 55%),
+                  linear-gradient(175deg,var(--bg0) 0%,var(--bg1) 100%);
+       background-attachment:fixed}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 26px}
+  ::selection{background:rgba(53,208,232,.35)}
 
-  /* ---------- 顶部导航 ---------- */
-  nav{position:sticky;top:0;z-index:50;background:rgba(7,28,40,.92);backdrop-filter:blur(8px);
-      border-bottom:1px solid rgba(255,255,255,.08)}
-  nav .wrap{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:10px 24px}
-  nav .brand{color:#e8f2f5;font-weight:700;font-size:14px;margin-right:14px;letter-spacing:.5px;white-space:nowrap}
-  nav .brand b{color:var(--glow)}
-  nav a{color:#b9cdd6;text-decoration:none;font-size:13px;padding:5px 10px;border-radius:6px;white-space:nowrap}
-  nav a:hover{color:#fff;background:rgba(255,255,255,.09)}
+  /* ---------- 导航 ---------- */
+  nav{position:sticky;top:0;z-index:50;background:rgba(4,18,27,.78);backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--hair2)}
+  nav .wrap{display:flex;align-items:center;gap:2px;flex-wrap:wrap;padding:13px 26px}
+  nav .brand{color:#fff;font-weight:700;font-size:14.5px;margin-right:18px;letter-spacing:.4px;white-space:nowrap}
+  nav .brand b{color:var(--cyan)}
+  nav a{color:#9db6c4;text-decoration:none;font-size:13px;padding:6px 11px;border-radius:8px;white-space:nowrap;transition:.18s}
+  nav a:hover{color:#fff;background:rgba(255,255,255,.08)}
 
   /* ---------- Hero ---------- */
-  header.hero{background:
-      radial-gradient(1100px 460px at 78% -10%, rgba(49,196,216,.16), transparent 60%),
-      linear-gradient(160deg,#071c28 0%,#0a2a3a 55%,#0d3547 100%);
-      color:#eef6f8;padding:64px 0 56px;border-bottom:4px solid var(--glow)}
-  .hero h1{font-size:34px;line-height:1.3;margin:0 0 10px;letter-spacing:.5px}
-  .hero h1 small{display:block;font-size:15px;font-weight:400;color:#9fc3cf;margin-top:10px;letter-spacing:.3px}
-  .hero .kicker{color:var(--glow);font-size:13px;font-weight:700;letter-spacing:2.5px;margin-bottom:14px}
-  .hero .lede{color:#c8dbe2;font-size:15.5px;max-width:860px;margin:0 0 30px}
-  .chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
-  .chip{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.13);border-radius:12px;
-        padding:16px 18px;backdrop-filter:blur(2px)}
-  .chip b{display:block;font-size:23px;color:#fff;letter-spacing:.3px;line-height:1.3;overflow-wrap:break-word}
-  .chip b.long{font-size:13.5px;letter-spacing:.2px;line-height:2.2;overflow-wrap:normal}
-  .chip span{display:block;font-size:12.5px;color:#9fc3cf;margin-top:6px;line-height:1.5}
+  header.hero{padding:96px 0 0;text-align:left}
+  .kicker{color:var(--cyan);font-size:12.5px;font-weight:800;letter-spacing:4px;margin-bottom:22px}
+  h1{font-size:clamp(36px,5.2vw,58px);line-height:1.14;margin:0;letter-spacing:-.5px;font-weight:800}
+  h1 .grad{background:linear-gradient(92deg,var(--cyan2),var(--cyan) 55%,#5ea5f0);
+           -webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--sub);font-size:16.5px;max-width:820px;margin:22px 0 0}
+  .lede b{color:var(--ink)}
+
+  .stats{display:flex;flex-wrap:wrap;margin:52px 0 60px;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)}
+  .stat{flex:1 1 190px;padding:24px 26px;border-left:1px solid var(--hair)}
+  .stat:first-child{border-left:none;padding-left:0}
+  .stat b{display:block;font-size:27px;font-weight:800;letter-spacing:-.3px;line-height:1.25;
+          background:linear-gradient(92deg,#fff,var(--cyan2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .stat b.long{font-size:16px;line-height:2;padding:5px 0}
+  .stat span{display:block;font-size:12.5px;color:var(--faint);margin-top:7px;line-height:1.55}
+
+  .screen{position:relative;border-radius:20px;overflow:hidden;
+          border:1px solid rgba(255,255,255,.13);
+          box-shadow:0 40px 90px rgba(0,0,0,.55), 0 0 0 1px rgba(53,208,232,.10), 0 0 140px rgba(53,208,232,.10)}
+  .screen video{display:block;width:100%;aspect-ratio:968/608;object-fit:cover;background:#02090e}
+  .screen .badge{position:absolute;left:18px;bottom:16px;font-size:12px;color:#dff6fb;
+          background:rgba(4,18,27,.72);backdrop-filter:blur(6px);border:1px solid var(--hair);
+          border-radius:999px;padding:6px 14px;letter-spacing:.3px}
+  .screen .badge i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--cyan);
+          margin-right:8px;box-shadow:0 0 8px var(--cyan);animation:pulse 2s infinite}
+  @keyframes pulse{50%{opacity:.35}}
+  .hero .cap{color:var(--faint);font-size:13px;margin:14px 4px 0}
+  .hero .cap a{color:var(--cyan);text-decoration:none}
 
   /* ---------- 正文 ---------- */
-  main{padding:14px 0 30px}
-  section{margin-top:58px;scroll-margin-top:64px}
-  h2{font-size:23px;margin:0 0 6px;display:flex;align-items:center;gap:12px}
-  h2 .no{flex:none;display:inline-flex;align-items:center;justify-content:center;
-         width:34px;height:34px;border-radius:9px;background:var(--navy);color:var(--glow);
-         font-size:15px;font-weight:800;box-shadow:0 2px 6px rgba(7,28,40,.25)}
-  h3{font-size:17px;margin:30px 0 8px;color:var(--accent-strong)}
-  .sub{color:var(--dim);font-size:14px;margin:0 0 16px}
-  p{margin:10px 0}
+  main{padding:10px 0 30px}
+  section{margin-top:110px;scroll-margin-top:70px}
+  .sec-head{position:relative;padding-left:84px;margin-bottom:26px;min-height:60px}
+  .sec-no{position:absolute;left:0;top:-10px;font-size:64px;font-weight:800;line-height:1;
+          letter-spacing:-2px;color:transparent;-webkit-text-stroke:1.5px rgba(53,208,232,.35)}
+  h2{font-size:27px;font-weight:800;margin:0 0 6px;letter-spacing:-.3px}
+  .sec-sub{color:var(--faint);font-size:14px;margin:0;max-width:760px}
+  h3{font-size:17.5px;margin:34px 0 10px;color:var(--cyan2)}
 
-  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 24px;
-        box-shadow:0 1px 3px rgba(16,42,56,.05);margin:16px 0}
-  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin:16px 0}
-  .use{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;
-       box-shadow:0 1px 3px rgba(16,42,56,.05)}
-  .use .tag{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:1px;color:#fff;
-       background:var(--accent);border-radius:6px;padding:2px 9px;margin-bottom:8px}
-  .use .tag.j{background:#7c5cbf}
-  .use b.t{display:block;font-size:15.5px;margin-bottom:4px}
-  .use p{font-size:13.5px;color:var(--dim);margin:4px 0 0;line-height:1.65}
+  .card{background:var(--card);border:1px solid var(--cardline);border-radius:16px;
+        padding:24px 28px;margin:18px 0;backdrop-filter:blur(4px)}
+
+  /* 用法卡 */
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:16px;margin:20px 0}
+  .use{background:var(--card);border:1px solid var(--cardline);border-radius:16px;padding:22px 24px;transition:.2s}
+  .use:hover{border-color:rgba(53,208,232,.4);transform:translateY(-2px)}
+  .use .tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:1.5px;color:#04222b;
+       background:linear-gradient(92deg,var(--cyan2),var(--cyan));border-radius:999px;padding:3px 12px;margin-bottom:12px}
+  .use .tag.j{color:#160b2e;background:linear-gradient(92deg,#c4b5fd,var(--purple))}
+  .use b.t{display:block;font-size:16.5px;margin-bottom:6px}
+  .use p{font-size:13.5px;color:var(--sub);margin:0;line-height:1.7}
   .use p b{color:var(--ink)}
 
-  table{border-collapse:collapse;width:100%;background:var(--card);font-size:13.5px;
-        border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:14px 0;
-        box-shadow:0 1px 3px rgba(16,42,56,.05)}
-  th,td{padding:8px 12px;border-bottom:1px solid var(--hairline);text-align:center}
-  th{background:#eef3f6;font-size:12.5px;letter-spacing:.4px;color:#41525f}
+  /* 表格 */
+  table{border-collapse:separate;border-spacing:0;width:100%;background:rgba(255,255,255,.028);font-size:13.5px;
+        border:1px solid var(--cardline);border-radius:14px;overflow:hidden;margin:16px 0}
+  th,td{padding:10px 14px;border-bottom:1px solid var(--hair2);text-align:center}
   tr:last-child td{border-bottom:none}
+  th{background:rgba(255,255,255,.045);font-size:12px;letter-spacing:1px;color:var(--sub);font-weight:700}
+  tbody tr{transition:.15s}
+  tbody tr:hover td{background:rgba(255,255,255,.025)}
   td.l,th.l{text-align:left}
   .ok{color:var(--ok);font-weight:700}.bad{color:var(--bad);font-weight:700}
   .hl td{background:var(--okbg)}
-  .cap{font-size:13px;color:var(--dim);margin:-6px 0 20px}
-  .dim{color:var(--dim);font-size:12.5px}
+  .cap{font-size:13px;color:var(--faint);margin:-4px 2px 20px;line-height:1.7}
+  .dim{color:var(--faint);font-size:12.5px}
 
-  figure{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:12px;
-         padding:14px;box-shadow:0 1px 3px rgba(16,42,56,.05)}
-  figure img,figure video{display:block;width:100%;border-radius:8px;background:#04141d}
-  figcaption{font-size:13px;color:var(--dim);padding:10px 6px 2px;line-height:1.6}
+  /* 图 */
+  figure{margin:26px 0;background:var(--card);border:1px solid var(--cardline);border-radius:18px;
+         padding:14px;overflow:hidden}
+  figure img{display:block;width:100%;border-radius:10px;background:#02090e}
+  figcaption{font-size:13px;color:var(--sub);padding:13px 8px 5px;line-height:1.7}
   figcaption b{color:var(--ink)}
 
-  .flow{background:var(--navy);color:#cfe6ee;border-radius:12px;padding:18px 22px;
-        font-family:ui-monospace,SFMono-Regular,Consolas,Menlo,monospace;font-size:13px;
-        white-space:pre;overflow-x:auto;line-height:1.8;box-shadow:0 2px 8px rgba(7,28,40,.25)}
-  .flow em{color:var(--glow);font-style:normal;font-weight:700}
+  /* 流程 */
+  .flow{background:rgba(2,12,18,.65);border:1px solid var(--cardline);color:#bfe6ef;border-radius:16px;
+        padding:22px 26px;font-family:ui-monospace,SFMono-Regular,Consolas,Menlo,monospace;font-size:13px;
+        white-space:pre;overflow-x:auto;line-height:1.9}
+  .flow em{color:var(--cyan);font-style:normal;font-weight:700}
 
-  .lesson{background:var(--card);border:1px solid var(--line);border-radius:12px;
-          padding:16px 20px;margin:12px 0;box-shadow:0 1px 3px rgba(16,42,56,.05)}
-  .lesson b.h{display:flex;align-items:baseline;gap:10px;font-size:15px}
-  .lesson b.h .k{flex:none;color:var(--accent);font-size:13px;font-weight:800}
-  .lesson p{font-size:13.5px;color:var(--dim);margin:6px 0 0}
-  .lesson p b{color:var(--ink)}
-  .recipe{background:var(--navy);color:#dff3f8;border-radius:12px;padding:18px 22px;margin:20px 0;
-          font-size:14.5px;box-shadow:0 2px 8px rgba(7,28,40,.25)}
-  .recipe .rt{color:var(--glow);font-weight:800;font-size:12.5px;letter-spacing:2px;margin-bottom:6px}
-  .note{background:var(--amberbg);border:1px solid var(--amberline);border-radius:12px;
-        padding:16px 20px;font-size:14px;margin:20px 0}
-  .quote{border-left:4px solid var(--glow);background:var(--card);border-radius:0 12px 12px 0;
-         padding:16px 20px;font-size:15px;margin:20px 0;box-shadow:0 1px 3px rgba(16,42,56,.05)}
-  code{background:#eef2f5;border-radius:5px;padding:1px 6px;font-size:.92em;
+  /* 调参经验 */
+  .lesson{display:flex;gap:18px;background:var(--card);border:1px solid var(--cardline);border-radius:16px;
+          padding:22px 26px;margin:14px 0;transition:.2s}
+  .lesson:hover{border-color:rgba(53,208,232,.35)}
+  .lesson .n{flex:none;font-size:30px;font-weight:800;line-height:1.15;width:44px;
+          background:linear-gradient(180deg,var(--cyan2),rgba(53,208,232,.25));
+          -webkit-background-clip:text;background-clip:text;color:transparent}
+  .lesson .b b.h{display:block;font-size:16px;margin-bottom:5px}
+  .lesson .b p{font-size:13.8px;color:var(--sub);margin:0}
+  .lesson .b p b{color:var(--ink)}
+
+  .recipe{position:relative;border-radius:18px;padding:24px 30px;margin:30px 0;
+          background:linear-gradient(rgba(6,26,37,.92),rgba(6,26,37,.92)) padding-box,
+                     linear-gradient(92deg,var(--cyan),var(--purple)) border-box;
+          border:1.5px solid transparent}
+  .recipe .rt{color:var(--cyan);font-weight:800;font-size:12px;letter-spacing:3px;margin-bottom:10px}
+  .recipe p{margin:0;font-size:15px}
+  .recipe p b{color:var(--cyan2)}
+
+  .note{background:rgba(217,178,58,.08);border:1px solid rgba(217,178,58,.35);border-radius:16px;
+        padding:20px 26px;font-size:14px;margin:26px 0}
+  .quote{border-left:3px solid var(--cyan);background:var(--card);border-radius:0 16px 16px 0;
+         padding:20px 26px;font-size:15px;margin:22px 0}
+  .quote .dim{display:inline-block;margin-top:6px}
+  code{background:rgba(255,255,255,.07);border-radius:6px;padding:2px 7px;font-size:.9em;
        font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
-  footer{border-top:1px solid var(--line);margin-top:70px;padding:26px 0 60px;color:var(--faint);font-size:13px}
-  @media (max-width:640px){ .hero h1{font-size:26px} td,th{padding:6px 6px;font-size:12.5px} }
+  a{color:var(--cyan)}
+  footer{border-top:1px solid var(--hair2);margin-top:110px;padding:30px 0 64px;color:var(--faint);font-size:13px}
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+  @media (max-width:640px){
+    .sec-head{padding-left:0;padding-top:56px}
+    .sec-no{top:-16px;font-size:48px}
+    .stat{padding:18px 16px}
+    .lesson{gap:12px;padding:18px}
+  }
 </style>
 </head>
 <body>
@@ -118,34 +163,38 @@
 </div></nav>
 
 <header class="hero"><div class="wrap">
-  <div class="kicker">UNDERWATER 3D GAUSSIAN SPLATTING · PROJECT SHOWCASE</div>
-  <h1>水下 3DGS 建图系统：Time-to-Map
-    <small>在保证地图质量的前提下，最小化「水下视频 → 可用 3DGS 地图」的时间 —— 免离线 COLMAP，浑水边采集边建图，免 GT 米制尺度</small>
-  </h1>
-  <p class="lede">把单目深度 + 去浊的<b>双输出模型（DIRECT）</b>用到水下增量 3DGS 建图的三个关键位置上：
-     几何初始化、米制定标、表示压缩。全部数字为 2026-09 冻结口径（官方 u8-PSNR，独占 GPU 计时），
-     在 coral 浑水（170 帧）与 AQUALOC 港湾（441 帧）两个场景验证。</p>
-  <div class="chips">
-    <div class="chip"><b>698 s</b><span>T@0.15 达标墙钟（170 帧，含推理与评测）</span></div>
-    <div class="chip"><b class="long">0.038→0.243→0.337</b><span>优化预算旋钮的锐度响应（离线上限 0.426 的 79%）</span></div>
-    <div class="chip"><b>−20% 高斯 · +15% FPS</b><span>D 置信度导引压缩（同 GPU 同视图实测 208→240 FPS，质量持平）</span></div>
-    <div class="chip"><b>−65.5% ATE</b><span>D 深度全局定标免 GT 米制化：AQUALOC 1.676→0.578&nbsp;m</span></div>
-    <div class="chip"><b>2 场景</b><span>coral 浑水 170 帧 + AQUALOC 港湾 441 帧，响应形态一致</span></div>
+  <div class="kicker">UNDERWATER 3D GAUSSIAN SPLATTING</div>
+  <h1>水下 3DGS 建图系统<br><span class="grad">Time-to-Map</span></h1>
+  <p class="lede">在保证地图质量的前提下，<b>最小化「水下视频 → 可用 3DGS 地图」的时间</b>——
+     免离线 COLMAP，浑水边采集边建图，免 GT 米制尺度。
+     把双输出模型（DIRECT：<b>D 深度</b> + <b>J 去浊</b>）用到初始化、米制、压缩三个关键位置。
+     数字为 2026-09 冻结口径（官方 u8-PSNR，独占 GPU 计时），coral 浑水（170 帧）与 AQUALOC 港湾（441 帧）双场景验证。</p>
+
+  <div class="stats">
+    <div class="stat"><b>698 s</b><span>T@0.15 达标墙钟<br>（170 帧，含推理与评测）</span></div>
+    <div class="stat"><b class="long">0.038 → 0.243 → 0.337</b><span>优化预算旋钮的锐度响应<br>（离线上限 0.426 的 79%）</span></div>
+    <div class="stat"><b>−20% · +15%</b><span>高斯压缩 / 渲染 FPS<br>（D-conf 导引，同卡实测 208→240）</span></div>
+    <div class="stat"><b>−65.5%</b><span>免 GT 米制化 ATE<br>（AQUALOC 1.676→0.578 m）</span></div>
+    <div class="stat"><b>2 场景</b><span>coral 浑水 + AQUALOC 港湾<br>响应形态一致</span></div>
   </div>
+
+  <div class="screen">
+    <video autoplay muted loop playsinline preload="auto"
+           poster="assets/video_poster.jpg" src="assets/flythrough_HQ_enhanced.mp4"></video>
+    <span class="badge"><i></i>高质量渲染 · flythrough（held-out PSNR 27.57 / Laplacian 22.45）</span>
+  </div>
+  <p class="cap">渲染自本项目的离线高质量参照——在线管线与它的完整质量账见
+  <a href="#ledger">在线 vs 离线账本</a>。</p>
 </div></header>
 
 <main><div class="wrap">
 
-  <figure>
-    <video controls preload="metadata" src="assets/flythrough_HQ_enhanced.mp4"></video>
-    <figcaption><b>高质量渲染视频</b>（held-out PSNR 27.57 / Laplacian 22.45）——本项目"质量端"的锚点；
-      在线管线与它的完整质量账见<a href="#ledger">在线 vs 离线账本</a>。</figcaption>
-  </figure>
-
-  <!-- ================ 〇 ================ -->
+  <!-- ================ 01 ================ -->
   <section id="goal">
-    <h2><span class="no">〇</span>研究目标</h2>
-    <div class="card">
+    <div class="sec-head reveal"><span class="sec-no">01</span>
+      <h2>研究目标</h2>
+      <p class="sec-sub">把"建图多快算快"变成一个可优化的指标。</p></div>
+    <div class="card reveal">
       <p><b>水下视频不依赖离线 COLMAP，能否在可接受时间内建成质量达标的 3DGS 地图？瓶颈到底在哪？</b></p>
       <p>把它定义成可优化的指标 <b>Time-to-Map</b>：T_map@Q = 在质量门控
       （PSNR_u8 ≥ 24 且 锐度保持 retention ≥ 0.15）下，从水下视频到可用地图的最短时间。
@@ -153,79 +202,83 @@
     </div>
   </section>
 
-  <!-- ================ 一 ================ -->
+  <!-- ================ 02 ================ -->
   <section id="dual">
-    <h2><span class="no">一</span>系统：双输出模型用在哪里</h2>
-    <div class="flow">水下视频帧 t ─→ DIRECT 推理 ─┬─ <em>D_t ×s_f 逐帧米制定标</em> ─→ 反投影点 ─→ 追加进持久高斯地图
+    <div class="sec-head reveal"><span class="sec-no">02</span>
+      <h2>系统：双输出模型用在哪里</h2>
+      <p class="sec-sub">整条管线不需要离线 COLMAP：初始化、尺度、压缩调度全部由双输出模型的深度分支承担。</p></div>
+    <div class="flow reveal">水下视频帧 t ─→ DIRECT 推理 ─┬─ <em>D_t ×s_f 逐帧米制定标</em> ─→ 反投影点 ─→ 追加进持久高斯地图
                                 └─ J_t（去浊外观，可选 init）
         每 chunk(10 帧) 光度增量训练（官方 densify/prune 调度）
         ─→ 质量门控评测(PSNR + retention) ─→ 持续精化</div>
-    <p class="sub">整条管线不需要离线 COLMAP：初始化、尺度、压缩调度全部由双输出模型的深度分支承担。</p>
     <div class="grid2">
-      <div class="use"><span class="tag">D · 深度</span><b class="t">几何初始化桥</b>
+      <div class="use reveal"><span class="tag">D · 深度</span><b class="t">几何初始化桥</b>
         <p>逐帧深度按米制系数反投影成点云，直接追加进持久高斯地图——<b>免 COLMAP 的浑水初始化</b>，
         这是整条在线管线能跑起来的前提。</p></div>
-      <div class="use"><span class="tag">D · 深度</span><b class="t">米制源（GT-free 定标）</b>
+      <div class="use reveal"><span class="tag">D · 深度</span><b class="t">米制源（GT-free 定标）</b>
         <p>全局单参数定标 s_d = median(z/z_direct)（33 万深度观测，全程无真值参与），
         把任意尺度的轨迹一步拉回米制——<b>离线 SfM 给不了的东西</b>。</p></div>
-      <div class="use"><span class="tag">D · 深度</span><b class="t">表示压缩调度器</b>
+      <div class="use reveal"><span class="tag">D · 深度</span><b class="t">表示压缩调度器</b>
         <p>深度的多视角一致性 = 逐高斯置信度，用它门控 densify：
         <b>−20% 高斯 / +15% 渲染 FPS，质量持平</b>（详见<a href="#compress">压缩一节</a>）。</p></div>
-      <div class="use"><span class="tag j">J · 去浊</span><b class="t">外观初始化 / 紧凑化</b>
+      <div class="use reveal"><span class="tag j">J · 去浊</span><b class="t">外观初始化 / 紧凑化</b>
         <p>去浊图像作外观 init：同 PSNR 下高斯更少（低预算档 <b>−37%</b>）。
         实测 J 做<b>几何监督无效</b>——J 的价值在外观与紧凑性，不在几何。</p></div>
     </div>
   </section>
 
-  <!-- ================ 二 ================ -->
+  <!-- ================ 03 ================ -->
   <section id="tuning">
-    <h2><span class="no">二</span>调参经验：在线水下 3DGS 的杠杆排序</h2>
-    <p class="sub">把有限算力花在哪？按实测杠杆从大到小——这也是本项目的核心 know-how。</p>
+    <div class="sec-head reveal"><span class="sec-no">03</span>
+      <h2>调参经验：在线水下 3DGS 的杠杆排序</h2>
+      <p class="sec-sub">把有限算力花在哪？按实测杠杆从大到小——这也是本项目的核心 know-how。</p></div>
 
-    <div class="lesson"><b class="h"><span class="k">①</span>优化预算是一阶杠杆，其他都是二阶</b>
+    <div class="lesson reveal"><span class="n">①</span><div class="b"><b class="h">优化预算是一阶杠杆，其他都是二阶</b>
       <p>同样的输入，只动训练预算：6.8k → 20.4k → 40.8k iters，锐度 retention
       <b>0.038 → 0.243 → 0.337</b>（同 init 离线训练上限 0.426）。深度模型精度、深度时序一致性、
-      写入策略、预算怎么分配——<b>都不是杠杆</b>。预算就是"质量-时间"旋钮，可随时停。</p></div>
+      写入策略、预算怎么分配——<b>都不是杠杆</b>。预算就是"质量-时间"旋钮，可随时停。</p></div></div>
 
-    <div class="lesson"><b class="h"><span class="k">②</span>预算要花在早期：锐度是长出来的，不是补回来的</b>
+    <div class="lesson reveal"><span class="n">②</span><div class="b"><b class="h">预算要花在早期：锐度是长出来的，不是补回来的</b>
       <p>锐度在<b>早期全视野 densify 生长</b>中形成。对已收敛模型重开 densify 窗：
       +1.3dB PSNR 却换 −0.10 锐度；延迟开始 densify、重排训练窗、按置信度正/反向门控——
-      全都不动锐度。<b>在线系统的预算应该花在早期生长，事后精修是亏本买卖。</b></p></div>
+      全都不动锐度。<b>在线系统的预算应该花在早期生长，事后精修是亏本买卖。</b></p></div></div>
 
-    <div class="lesson"><b class="h"><span class="k">③</span>位姿要"光度一致"，而不只是轨迹准</b>
+    <div class="lesson reveal"><span class="n">③</span><div class="b"><b class="h">位姿要"光度一致"，而不只是轨迹准</b>
       <p>决定渲染是高质量还是概览级的，是位姿的<b>局部逐对光度一致性</b>（重投影 0.2px vs 16px 的差别）；
-      轨迹的米制/形状精度是另一回事，两者独立。米制轨迹喂 3DGS 照样糊，光度一致位姿才出细节：</p></div>
+      轨迹的米制/形状精度是另一回事，两者独立。米制轨迹喂 3DGS 照样糊，光度一致位姿才出细节：</p></div></div>
 
-    <figure>
+    <figure class="reveal">
       <img src="assets/filmstrip_slam_vs_hq.jpg" alt="位姿光度一致性决定渲染质量">
       <figcaption><b>同一序列、同一训练器</b>：上 = 常规 SLAM 位姿（概览级，细节丢失）；
         下 = 光度一致位姿 + 双输出联合 init（高质量）。位姿一致性是水下 3DGS 画质的第一张入场券。</figcaption>
     </figure>
 
-    <div class="lesson"><b class="h"><span class="k">④</span>init 组成：稀疏脚手架 ∪ 深度反投影</b>
+    <div class="lesson reveal"><span class="n">④</span><div class="b"><b class="h">init 组成：稀疏脚手架 ∪ 深度反投影</b>
       <p>纯深度反投影 init 缺光度脚手架；<b>稀疏点 ∪ DIRECT 反投影的联合 init</b>
       在光度一致位姿下恢复离线锐度的 92%。J 外观 init 额外省高斯（预算越紧收益越大：
-      6.8k 档 −37%，20.4k 档 −12%——预算充分后 densify 会回填外观优势）。</p></div>
+      6.8k 档 −37%，20.4k 档 −12%——预算充分后 densify 会回填外观优势）。</p></div></div>
 
-    <div class="lesson"><b class="h"><span class="k">⑤</span>渲染 FPS 跟"可见高斯"走，不跟总高斯走</b>
+    <div class="lesson reveal"><span class="n">⑤</span><div class="b"><b class="h">渲染 FPS 跟"可见高斯"走，不跟总高斯走</b>
       <p>总高斯 −20% 只带来可见高斯 −14%、FPS +15%；而 batch 地图总高斯更多、
       <b>可见高斯少 32%，FPS 反而 +21%</b>。增量建图的壳层冗余是"看得见的负担"——
-      想提速，压的是视野内可见数量。</p></div>
+      想提速，压的是视野内可见数量。</p></div></div>
 
-    <div class="lesson"><b class="h"><span class="k">⑥</span>早停看 retention，别只看 loss / PSNR</b>
+    <div class="lesson reveal"><span class="n">⑥</span><div class="b"><b class="h">早停看 retention，别只看 loss / PSNR</b>
       <p>光度 loss 与 PSNR 很早就平台化，<b>锐度 retention 却还在长</b>——按 loss 平台自适应早停
-      会停在 retention 0.045（vs 同预算可达 0.243）。质量门控必须是渲染口径（PSNR + Laplacian 比）。</p></div>
+      会停在 retention 0.045（vs 同预算可达 0.243）。质量门控必须是渲染口径（PSNR + Laplacian 比）。</p></div></div>
 
-    <div class="recipe"><div class="rt">RECOMMENDED RECIPE · 推荐配方</div>
-      D 逐帧米制反投影 init　+　稀疏 ∪ DIRECT 联合 init　+　J 外观 init　+
+    <div class="recipe reveal"><div class="rt">RECOMMENDED RECIPE · 推荐配方</div>
+      <p>D 逐帧米制反投影 init　+　稀疏 ∪ DIRECT 联合 init　+　J 外观 init　+
       conf≥p50 门控 densify　+　全局 s_d 定标米制化 ——
-      即压缩阶梯的 <b>L2 推荐档</b>：高斯 −20.4% / FPS +15.3% / VRAM −7.5%，质量持平。</div>
+      即压缩阶梯的 <b>L2 推荐档</b>：高斯 −20.4% / FPS +15.3% / VRAM −7.5%，质量持平。</p></div>
   </section>
 
-  <!-- ================ 三 ================ -->
+  <!-- ================ 04 ================ -->
   <section id="ladder">
-    <h2><span class="no">三</span>主结果 ①：Time-to-Map 与预算旋钮（coral，170 帧）</h2>
-    <table>
+    <div class="sec-head reveal"><span class="sec-no">04</span>
+      <h2>主结果 ①：Time-to-Map 与预算旋钮</h2>
+      <p class="sec-sub">coral 浑水关键帧序列，170 帧，独占 GPU 计时。</p></div>
+    <table class="reveal">
       <tr><th class="l">配置</th><th>训练 iters</th><th>锐度 retention</th><th>PSNR_u8</th><th>墙钟（独占）</th></tr>
       <tr><td class="l">最小预算</td><td>6.8k</td><td>0.038</td><td>26.03</td><td>370 s</td></tr>
       <tr class="hl"><td class="l">在线推荐档 ← <b>T@0.15 = 698 s</b></td><td>20.4k</td><td><b>0.243 ±0.006</b></td><td>26.16</td><td><b>~890 s</b></td></tr>
@@ -235,51 +288,55 @@
       <tr><td class="l">按 loss 平台早停</td><td>8.4k 即停</td><td class="bad">0.045</td><td>26.03</td><td>442 s</td></tr>
     </table>
     <p class="cap">预算 = 质量-时间旋钮：在 0.038–0.337 之间随取随停；"换在线位姿"行说明位姿等级在低预算下无关紧要、预算解锁后才成为天花板。早停行是教训 ⑥ 的实测。</p>
-    <figure>
+    <figure class="reveal">
       <img src="assets/video_budget_ladder_coral.gif" alt="coral 预算阶梯渲染对比动图">
       <figcaption>同一帧在不同预算下的渲染演化（最小预算 → 推荐档 → 高预算 vs 离线上限）。</figcaption>
     </figure>
-    <figure>
+    <figure class="reveal">
       <img src="assets/video_time_evolution_Ax6_coral.gif" alt="建图时间演化动图">
       <figcaption>增量建图随时间推进的渲染演化——"采集即建"的直观形态。</figcaption>
     </figure>
-    <figure>
+    <figure class="reveal">
       <img src="assets/video_budget_ladder_aqualoc.gif" alt="AQUALOC 预算阶梯动图">
       <figcaption><b>跨场景复现</b>：AQUALOC（441 帧）预算-响应形态一致：retention
         0.141→0.220→0.337，PSNR_u8 19.0→34.5，T@0.15 = 354 s——结论不依赖单一场景。</figcaption>
     </figure>
   </section>
 
-  <!-- ================ 四 ================ -->
+  <!-- ================ 05 ================ -->
   <section id="metric">
-    <h2><span class="no">四</span>主结果 ②：免 GT 米制化（AQUALOC）</h2>
-    <div class="card">
+    <div class="sec-head reveal"><span class="sec-no">05</span>
+      <h2>主结果 ②：免 GT 米制化（AQUALOC）</h2>
+      <p class="sec-sub">离线 COLMAP 只给任意尺度的轨迹；一个参数把轨迹拉回米制，全程无真值参与。</p></div>
+    <div class="card reveal">
       <p>离线 COLMAP 只给<b>任意尺度</b>的轨迹（SE3-ATE 1.676 m，尺度差 43%）。用
       DIRECT 深度做<b>全局单参数定标</b> s_d = median(z/z_direct)（33 万深度观测，全程无真值参与），
       一步把轨迹拉回米制：</p>
-      <p style="font-size:17px"><b>SE3-ATE：1.676 m → 0.578 m（−65.5%）</b>，
-      sim3_scale 0.57 → 0.95 ≈ 1（与压力计独立米制源交叉验证）。</p>
+      <p style="font-size:19px"><b>SE3-ATE：1.676 m → 0.578 m（−65.5%）</b>
+      <span style="color:var(--faint)">　·　sim3_scale 0.57 → 0.95 ≈ 1（与压力计独立米制源交叉验证）</span></p>
       <p>SE3 ≈ Sim3（0.578 ≈ 0.568）意味着<b>米制版免费达到了免尺度版的形状质量</b>——
       机制是 1 参数定标即达标（联合 BA 在定标初值上零移动）。
       <span class="dim">边界：505/1529 帧注册覆盖、离线、单序列。</span></p>
     </div>
-    <figure>
+    <figure class="reveal">
       <img src="assets/aqualoc_traj.jpg" alt="AQUALOC 轨迹顶视图：raw vs 米制">
       <figcaption>轨迹顶视图（SE3 对齐、不拟合尺度）：黑 = 压力计米制 GT，红 = COLMAP 原始（尺度漂移），
         绿 = DIRECT 全局定标后——绿线贴住黑线。</figcaption>
     </figure>
-    <figure>
+    <figure class="reveal">
       <img src="assets/aqualoc_err.jpg" alt="逐帧 ATE 误差曲线">
       <figcaption>逐帧对齐误差（n=505 注册帧）：红 = raw（尾部漂到 3.4 m），绿 = 米制（全程 &lt;1.2 m）。</figcaption>
     </figure>
   </section>
 
-  <!-- ================ 五 ================ -->
+  <!-- ================ 06 ================ -->
   <section id="compress">
-    <h2><span class="no">五</span>主结果 ③：D 置信度导引的表示压缩</h2>
+    <div class="sec-head reveal"><span class="sec-no">06</span>
+      <h2>主结果 ③：D 置信度导引的表示压缩</h2>
+      <p class="sec-sub">深度的多视角一致性 = 逐高斯置信度；它不提画质，但同质量把地图做小做快。</p></div>
     <p>把 DIRECT 深度的<b>多视角一致性</b>变成逐高斯置信度（conf），门控 densify——
     "把有限计算导向几何上可信的区域"。固定 20.4k 预算对照：</p>
-    <table>
+    <table class="reveal">
       <tr><th class="l">配置 @20.4k</th><th>retention</th><th>PSNR_u8</th><th>高斯数</th><th>墙钟</th></tr>
       <tr><td class="l">增量基准（官方窗）</td><td>0.243</td><td>26.16</td><td>1.50M</td><td>~890 s</td></tr>
       <tr><td class="l">batch 等预算参照</td><td>0.302</td><td>26.53</td><td>1.55M</td><td>864 s</td></tr>
@@ -290,13 +347,13 @@
     </table>
     <p><b>判读</b>：conf 门控<b>不提升画质</b>——正反门控同结果（conf 与锐度正交）；
     <b>它的价值在压缩轴：−29% 高斯换 +0.25dB PSNR</b>，直接兑现为渲染加速与表示体积。</p>
-    <figure>
+    <figure class="reveal">
       <img src="assets/cmp_final.png" alt="各配置终态渲染对比">
       <figcaption>终态渲染对比：GT 参照 / 最小预算 / 在线推荐档 / conf 门控（同预算更紧凑）/ 高预算 / batch 上限。</figcaption>
     </figure>
 
     <h3>工程压缩阶梯（全部实测渲染基准）</h3>
-    <table>
+    <table class="reveal">
       <tr><th class="l">配置 @20.4k</th><th>retention</th><th>PSNR_u8</th><th>高斯数</th><th>可见高斯</th><th>渲染 FPS</th><th>VRAM</th></tr>
       <tr><td class="l">L0 基线</td><td>0.232</td><td>26.06</td><td>1.512M</td><td>486k</td><td>208</td><td>3219MB</td></tr>
       <tr><td class="l">L1 + J 外观 init</td><td>0.231</td><td>25.93</td><td>1.336M</td><td>438k</td><td>226</td><td>3088MB</td></tr>
@@ -305,18 +362,20 @@
       <tr><td class="l">L3 + p75（过度压缩）</td><td>0.213</td><td>25.97</td><td>1.158M</td><td>399k</td><td>247</td><td>2937MB</td></tr>
       <tr><td class="l">batch 上限参照</td><td>0.426</td><td>26.46</td><td>1.552M</td><td><b>329k</b></td><td><b>254</b></td><td>3157MB</td></tr>
     </table>
-    <p class="dim">渲染基准协议：同 GPU / 同 25 test 视图 / 同渲染器，warmup 10 轮计 50 轮；
+    <p class="cap">渲染基准协议：同 GPU / 同 25 test 视图 / 同渲染器，warmup 10 轮计 50 轮；
     可见高斯 = radii&gt;0 均值。J-init 的压缩收益随预算提高而收缩（6.8k 档 −37% → 20.4k 档 −12%），
     与 conf 门控叠加后总压缩 −20%；p75 过度（retention −0.019）。</p>
-    <div class="note"><b>一句话机理</b>：在线增量的锐度天花板比 batch 低 ~0.06（结构性锐度税），
+    <div class="note reveal"><b>一句话机理</b>：在线增量的锐度天花板比 batch 低 ~0.06（结构性锐度税），
     且<b>事后不可恢复</b>——重开 densify、延迟生长、重新分配预算、conf 门控都不动锐度。
     设计在线 3DGS 系统时，把预算花在早期生长，把压缩交给置信度门控。</div>
   </section>
 
-  <!-- ================ 六 ================ -->
+  <!-- ================ 07 ================ -->
   <section id="ledger">
-    <h2><span class="no">六</span>在线 vs 离线：Time-to-Map 的账</h2>
-    <table>
+    <div class="sec-head reveal"><span class="sec-no">07</span>
+      <h2>在线 vs 离线：Time-to-Map 的账</h2>
+      <p class="sec-sub">不是刷离线质量榜——在线系统赢在时间轴、米制、鲁棒与可控性。</p></div>
+    <table class="reveal">
       <tr><th class="l" style="width:24%">维度</th><th class="l">在线增量（本项目）</th><th class="l">离线参照</th></tr>
       <tr><td class="l">首个达标地图 T@0.15</td><td class="ok"><b>698 s</b>（采集即建，边走边出图）</td>
           <td>须全量数据到齐：COLMAP 数小时 + 训练 ~20 min</td></tr>
@@ -333,9 +392,8 @@
     </table>
     <p><b>优势一句话</b>：不是渲染质量超过离线——PSNR 打平（99%），锐度有结构性差距；
     赢在<b>时间轴（采集即建 vs 到齐再建）、米制（离线 COLMAP 给不了）、浑水鲁棒
-    （免 SfM）、预算可控、地图更紧凑</b>。这是"在线系统"对"离线管线"的差异化定位，
-    而非刷离线质量榜。</p>
-    <figure>
+    （免 SfM）、预算可控、地图更紧凑</b>。</p>
+    <figure class="reveal">
       <img src="assets/cmp_ladder_zoom.jpg" alt="公开数据集 SeaThruNeRF 上的配方对比">
       <figcaption><b>配方泛化</b>：同一套联合 init 配方搬到公开清水数据集 SeaThruNeRF，
       五档对比中 PSNR/SSIM/LPIPS 三指标均最优（22.36/0.865/0.199）；四场景宏平均
@@ -343,28 +401,32 @@
     </figure>
   </section>
 
-  <!-- ================ 七 ================ -->
+  <!-- ================ 08 ================ -->
   <section id="conclusion">
-    <h2><span class="no">七</span>结论与边界</h2>
-    <div class="card">
+    <div class="sec-head reveal"><span class="sec-no">08</span>
+      <h2>结论与边界</h2>
+      <p class="sec-sub">三条可复述的结论，和一条不越界的措辞。</p></div>
+    <div class="card reveal">
       <p>① 在线增量 3DGS 的质量一阶杠杆是<b>优化预算</b>；位姿等级是预算解锁后的第二瓶颈。
       ② 双输出模型的正确用法 = <b>几何初始化桥 + 表示压缩调度器 + 米制源</b>（外加 J 的外观紧凑化），
       而非画质提升。③ 增量 → batch 存在 ~0.06 的结构性锐度税，事后不可恢复——
       这是在线 3DGS 系统设计的方向性约束。</p>
     </div>
-    <div class="quote"><b>正式措辞（引用请逐字）</b>：<br>
+    <div class="quote reveal"><b>正式措辞（引用请逐字）</b>：<br>
       在 DIRECT D-init + 在线位姿 + 增量 3DGS 条件下，系统地测得优化预算是早期地图质量的一阶因素；
       位姿质量在预算提升后成为进一步限制因素；若干直觉上的 depth/fusion/densification
       调整未显示同量级收益。<span class="dim">（不声称"解决了水下 3DGS 核心难点"。）</span></div>
-    <p class="dim">诚实条目：主结论在 coral（170 帧，单场景）；AQUALOC 复现预算-响应趋势
+    <p class="cap">诚实条目：主结论在 coral（170 帧，单场景）；AQUALOC 复现预算-响应趋势
     （441 帧）。在线建图为 near-online（170 帧约 15 分钟），非 real-time。
     置信度门控与全窗的差异属边缘量级。更早口径的数字已退役，本页不引用。</p>
   </section>
 
   <!-- ================ 数据 ================ -->
   <section id="data">
-    <h2><span class="no">数</span>结果数据原件（data/）</h2>
-    <table>
+    <div class="sec-head reveal"><span class="sec-no">◈</span>
+      <h2>结果数据原件（data/）</h2>
+      <p class="sec-sub">头条数字的机器可读原始 JSON，未手抄、未改写。</p></div>
+    <table class="reveal">
       <tr><th class="l">文件</th><th class="l">内容</th></tr>
       <tr><td class="l"><code>canonical_analysis.json</code></td><td class="l">Time-to-Map 各档位：retention / PSNR / 质量门达线时刻 / 独占墙钟（698 s、预算阶梯、上限 0.426 均出于此）</td></tr>
       <tr><td class="l"><code>retention.json</code></td><td class="l">调度与压缩各配置的逐检查点曲线（retention / PSNR / 高斯数 / 墙钟）</td></tr>
@@ -375,10 +437,13 @@
 
 </div></main>
 
-<footer>
-  <div class="wrap">
-    冻结于 2026-09-24 · 本仓库为项目展示层，数字与图表均为最终冻结口径。
-  </div>
-</footer>
+<footer><div class="wrap">
+  冻结于 2026-09-24 · 本仓库为项目展示层，数字与图表均为最终冻结口径。
+</div></footer>
+
+<script>
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.08});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
 </body>
 </html>
