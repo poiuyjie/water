@@ -1,0 +1,10 @@
+{
+  "tag": "e18b_metric_ba",
+  "n": 505,
+  "ate_se3_m": 0.5775,
+  "ate_sim3_m": 0.5679,
+  "sim3_scale": 0.9525,
+  "path_est_m": 9.07,
+  "path_gt_m": 14.93,
+  "note": "GT=AQUALOC new_ COLMAP \u8f68\u8ff9(\u5f62\u72b6 COLMAP+\u5c3a\u5ea6\u538b\u529b\u8ba1);\u7c73\u5236\u65b9\u6cd5\u5934\u6761\u6570=ate_se3_m,\u4e14 sim3_scale\u22481 \u4e3a\u72ec\u7acb\u7c73\u5236\u6e90\u4ea4\u53c9\u9a8c\u8bc1"
+}

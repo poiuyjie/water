@@ -1,0 +1,62 @@
+[
+ {
+  "name": "A3_ref",
+  "ply": "/scratch/ywj/uw_gs_slam/outputs/E2026-0924-07/A3/final.ply",
+  "n_gauss": 1503488,
+  "fps": 209.8,
+  "visible_mean": 485388,
+  "visible_std": 282219,
+  "peak_vram_mb": 3214.0,
+  "load_s": 14.7
+ },
+ {
+  "name": "REF",
+  "ply": "/scratch/ywj/uw_gs_slam/outputs/E2026-0924-07/REF/final.ply",
+  "n_gauss": 1552142,
+  "fps": 253.9,
+  "visible_mean": 328641,
+  "visible_std": 166751,
+  "peak_vram_mb": 3157.0,
+  "load_s": 12.8
+ },
+ {
+  "name": "L0",
+  "ply": "/scratch/ywj/uw_gs_slam/outputs/E2026-0924-09/L0/final.ply",
+  "n_gauss": 1512565,
+  "fps": 208.2,
+  "visible_mean": 485650,
+  "visible_std": 282965,
+  "peak_vram_mb": 3219.0,
+  "load_s": 13.9
+ },
+ {
+  "name": "L1",
+  "ply": "/scratch/ywj/uw_gs_slam/outputs/E2026-0924-09/L1/final.ply",
+  "n_gauss": 1336232,
+  "fps": 225.7,
+  "visible_mean": 438132,
+  "visible_std": 246874,
+  "peak_vram_mb": 3088.0,
+  "load_s": 13.2
+ },
+ {
+  "name": "L2",
+  "ply": "/scratch/ywj/uw_gs_slam/outputs/E2026-0924-09/L2/final.ply",
+  "n_gauss": 1203559,
+  "fps": 240.0,
+  "visible_mean": 415410,
+  "visible_std": 227319,
+  "peak_vram_mb": 2979.0,
+  "load_s": 12.6
+ },
+ {
+  "name": "L3",
+  "ply": "/scratch/ywj/uw_gs_slam/outputs/E2026-0924-09/L3/final.ply",
+  "n_gauss": 1158303,
+  "fps": 246.8,
+  "visible_mean": 399225,
+  "visible_std": 215550,
+  "peak_vram_mb": 2937.0,
+  "load_s": 12.3
+ }
+]

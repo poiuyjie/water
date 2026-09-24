@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>水下 3DGS 建图 · Time-to-Map — 完整报告</title>
+<style>
+  :root{
+    --ink:#1c2430; --dim:#5b6b7b; --faint:#8a99a8;
+    --paper:#f7f9fa; --card:#ffffff; --line:#dde5ea; --hairline:#e9eef2;
+    --accent:#0e7c9c; --accent-strong:#0a5d75; --glow:#31c4d8;
+    --ok:#0f7b4d; --okbg:#e9f6ef; --bad:#b3382e; --badbg:#fbeced;
+    --amberbg:#fff7dd; --amberline:#d9b23a; --navy:#071c28;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Helvetica,Arial,sans-serif;
+       line-height:1.75;font-variant-numeric:tabular-nums}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+
+  /* ---------- 顶部导航 ---------- */
+  nav{position:sticky;top:0;z-index:50;background:rgba(7,28,40,.92);backdrop-filter:blur(8px);
+      border-bottom:1px solid rgba(255,255,255,.08)}
+  nav .wrap{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:10px 24px}
+  nav .brand{color:#e8f2f5;font-weight:700;font-size:14px;margin-right:14px;letter-spacing:.5px;white-space:nowrap}
+  nav .brand b{color:var(--glow)}
+  nav a{color:#b9cdd6;text-decoration:none;font-size:13px;padding:5px 10px;border-radius:6px;white-space:nowrap}
+  nav a:hover{color:#fff;background:rgba(255,255,255,.09)}
+
+  /* ---------- Hero ---------- */
+  header.hero{background:
+      radial-gradient(1100px 460px at 78% -10%, rgba(49,196,216,.16), transparent 60%),
+      linear-gradient(160deg,#071c28 0%,#0a2a3a 55%,#0d3547 100%);
+      color:#eef6f8;padding:64px 0 56px;border-bottom:4px solid var(--glow)}
+  .hero h1{font-size:34px;line-height:1.3;margin:0 0 10px;letter-spacing:.5px}
+  .hero h1 small{display:block;font-size:15px;font-weight:400;color:#9fc3cf;margin-top:10px;letter-spacing:.3px}
+  .hero .kicker{color:var(--glow);font-size:13px;font-weight:700;letter-spacing:2.5px;margin-bottom:14px}
+  .hero .lede{color:#c8dbe2;font-size:15.5px;max-width:860px;margin:0 0 30px}
+  .chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+  .chip{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.13);border-radius:12px;
+        padding:16px 18px;backdrop-filter:blur(2px)}
+  .chip b{display:block;font-size:24px;color:#fff;letter-spacing:.3px;line-height:1.25}
+  .chip span{display:block;font-size:12.5px;color:#9fc3cf;margin-top:6px;line-height:1.5}
+
+  /* ---------- 正文 ---------- */
+  main{padding:14px 0 30px}
+  section{margin-top:58px;scroll-margin-top:64px}
+  h2{font-size:23px;margin:0 0 6px;display:flex;align-items:center;gap:12px}
+  h2 .no{flex:none;display:inline-flex;align-items:center;justify-content:center;
+         width:34px;height:34px;border-radius:9px;background:var(--navy);color:var(--glow);
+         font-size:15px;font-weight:800;box-shadow:0 2px 6px rgba(7,28,40,.25)}
+  h3{font-size:17px;margin:30px 0 8px;color:var(--accent-strong)}
+  .sub{color:var(--dim);font-size:14px;margin:0 0 16px}
+  p{margin:10px 0}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 24px;
+        box-shadow:0 1px 3px rgba(16,42,56,.05);margin:16px 0}
+
+  table{border-collapse:collapse;width:100%;background:var(--card);font-size:13.5px;
+        border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:14px 0;
+        box-shadow:0 1px 3px rgba(16,42,56,.05)}
+  th,td{padding:8px 12px;border-bottom:1px solid var(--hairline);text-align:center}
+  th{background:#eef3f6;font-size:12.5px;letter-spacing:.4px;color:#41525f}
+  tr:last-child td{border-bottom:none}
+  td.l,th.l{text-align:left}
+  .ok{color:var(--ok);font-weight:700}.bad{color:var(--bad);font-weight:700}
+  .hl td{background:var(--okbg)}
+  .cap{font-size:13px;color:var(--dim);margin:-6px 0 20px}
+  .dim{color:var(--dim);font-size:12.5px}
+
+  figure{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:12px;
+         padding:14px;box-shadow:0 1px 3px rgba(16,42,56,.05)}
+  figure img,figure video{display:block;width:100%;border-radius:8px;background:#04141d}
+  figcaption{font-size:13px;color:var(--dim);padding:10px 6px 2px;line-height:1.6}
+  figcaption b{color:var(--ink)}
+
+  .flow{background:var(--navy);color:#cfe6ee;border-radius:12px;padding:18px 22px;
+        font-family:ui-monospace,SFMono-Regular,Consolas,Menlo,monospace;font-size:13px;
+        white-space:pre;overflow-x:auto;line-height:1.8;box-shadow:0 2px 8px rgba(7,28,40,.25)}
+  .flow em{color:var(--glow);font-style:normal;font-weight:700}
+
+  .note{background:var(--amberbg);border:1px solid var(--amberline);border-radius:12px;
+        padding:16px 20px;font-size:14px;margin:20px 0}
+  .quote{border-left:4px solid var(--glow);background:var(--card);border-radius:0 12px 12px 0;
+         padding:16px 20px;font-size:15px;margin:20px 0;box-shadow:0 1px 3px rgba(16,42,56,.05)}
+  code{background:#eef2f5;border-radius:5px;padding:1px 6px;font-size:.92em;
+       font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+  footer{border-top:1px solid var(--line);margin-top:70px;padding:26px 0 60px;color:var(--faint);font-size:13px}
+  @media (max-width:640px){ .hero h1{font-size:26px} td,th{padding:6px 6px;font-size:12.5px} }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <span class="brand">water<b>·</b>Time-to-Map</span>
+  <a href="#goal">研究目标</a><a href="#system">系统</a><a href="#chain">排除链</a>
+  <a href="#ladder">预算阶梯</a><a href="#metric">米制化</a><a href="#guided">导引压缩</a>
+  <a href="#ledger">在线vs离线</a><a href="#conclusion">结论</a><a href="#appx">附录</a><a href="#data">数据</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="kicker">UNDERWATER 3D GAUSSIAN SPLATTING · RESEARCH SHOWCASE</div>
+  <h1>水下 3DGS 建图系统：Time-to-Map
+    <small>在保证地图质量的前提下，最小化「水下视频 → 可用 3DGS 地图」的时间 —— 免离线 COLMAP，浑水边采集边建图，免 GT 米制尺度</small>
+  </h1>
+  <p class="lede">个人研究项目 · 2026-09 · coral 浑水关键帧序列 + AQUALOC 港湾序列 ·
+     双输出模型 DIRECT（D 单目深度 + J 去浊图像）。本页全部数字为 canonical 冻结口径
+     （E2026-0924-07/08/09，官方 u8-PSNR，独占 GPU 计时）。</p>
+  <div class="chips">
+    <div class="chip"><b>698 s</b><span>T@0.15 达标墙钟（170 帧，含推理与评测）</span></div>
+    <div class="chip"><b>0.038→0.243→0.337</b><span>优化预算阶梯的锐度响应（离线上限 0.426 的 79%）</span></div>
+    <div class="chip"><b>−20% 高斯 · +15% FPS</b><span>D 置信度导引压缩（同 GPU 同视图实测 208→240 FPS，质量持平）</span></div>
+    <div class="chip"><b>−65.5% ATE</b><span>D 深度全局定标免 GT 米制化：AQUALOC 1.676→0.578 m</span></div>
+    <div class="chip"><b>30+ 臂</b><span>受控实验（oracle 对照 / 双 seed / 预注册）定位因果结构</span></div>
+  </div>
+</div></header>
+
+<main><div class="wrap">
+
+  <figure>
+    <video controls preload="metadata" src="assets/flythrough_HQ_enhanced.mp4"></video>
+    <figcaption><b>主交付渲染视频</b>：离线高质量参照（原生 COLMAP 位姿全链，held-out
+      PSNR 27.57 / Laplacian 22.45，E2026-0919-06）——本项目"质量端"的锚点；
+      在线管线与它的完整质量账见<a href="#ledger">在线 vs 离线账本</a>。</figcaption>
+  </figure>
+
+  <!-- ================ 〇 ================ -->
+  <section id="goal">
+    <h2><span class="no">〇</span>研究目标</h2>
+    <div class="card">
+      <p><b>水下视频不依赖离线 COLMAP，能否在可接受时间内建成质量达标的 3DGS 地图？瓶颈到底在哪？</b></p>
+      <p>把它定义成可优化的指标 <b>Time-to-Map</b>：T_map@Q = 在质量门控
+      （PSNR_u8 ≥ 24 且 锐度保持 retention ≥ 0.15）下，从水下视频到可用地图的最短时间。
+      锐度 retention = 渲染图与真值图的 Laplacian 方差中位比（衡量高频几何细节存留）。</p>
+    </div>
+  </section>
+
+  <!-- ================ 一 ================ -->
+  <section id="system">
+    <h2><span class="no">一</span>系统：免 COLMAP 的增量 3DGS 建图</h2>
+    <div class="flow">水下视频帧 t ─→ DIRECT 推理 ─┬─ <em>D_t ×s_f 逐帧米制定标</em> ─→ 反投影点 ─→ 追加进持久高斯地图
+                                └─ J_t（去浊外观，可选 init）
+        每 chunk(10 帧) 400–2400 iters 光度增量训练（官方 densify/prune 调度）
+        ─→ 质量门控评测(PSNR + retention) ─→ 持续精化</div>
+    <p>DIRECT 双输出的实测角色分工：<b>D = 几何初始化桥</b>（承重——免 COLMAP 管线与
+    0.426 锐度天花板均由 D-init 达成）<b>+ 表示压缩调度器</b>（第五节）；
+    <b>J = 外观紧凑化</b>（同 PSNR 高斯 −37%）；J 做几何监督无效（E2026-0923-02 双 seed 判决）。</p>
+  </section>
+
+  <!-- ================ 二 ================ -->
+  <section id="chain">
+    <h2><span class="no">二</span>质量差距从哪来：因果排除链</h2>
+    <figure>
+      <img src="assets/filmstrip_slam_vs_hq.jpg" alt="SLAM 位姿 vs 光度一致位姿渲染对比">
+      <figcaption><b>定性对照</b>：同一序列、同一 3DGS 训练器——左：SLAM 位姿图位姿（重投影
+        16.05px）只到概览级；右：光度一致位姿（0.2px）+ 双输出联合 init 达到高质量。
+        局部逐对光度一致性主导渲染质量（E2026-0921-13..16 乱位姿更正后的真值重跑定论）。</figcaption>
+    </figure>
+    <p>水下 3DGS 地图糊，直觉候选是深度模型/时序一致性/位姿/水质。逐个用受控实验判决：</p>
+    <table>
+      <tr><th style="width:22%">候选因素</th><th class="l" style="width:44%">判别实验</th><th>判决</th></tr>
+      <tr><td>深度模型精度</td><td class="l">oracle 对照：喂离线模型渲出的真值级深度（E2026-0923-05 C1）</td>
+          <td class="bad">排除——真值深度也不救锐度</td></tr>
+      <tr><td>深度时序一致性</td><td class="l">同上（oracle = 完美时序一致）</td><td class="bad">排除（二阶）</td></tr>
+      <tr><td>点云写入策略</td><td class="l">体素融合 vs 直接追加，双 seed（E2026-0923-05 B×3）</td>
+          <td class="bad">排除——差值在 seed 噪声内</td></tr>
+      <tr><td>J 去浊图像监督</td><td class="l">2×2 + 路由臂，双 seed（E2026-0923-02）</td><td class="bad">中性</td></tr>
+      <tr><td>位姿质量</td><td class="l">SfM/在线 prior-BA/位姿图 × 三档预算（E2026-0924-06/07）</td>
+          <td class="ok">二阶——预算解锁后才显形（0.24 vs 0.10）</td></tr>
+      <tr><td><b>优化预算</b></td><td class="l"><b>预算阶梯 + batch 上限定锚（E2026-0923-05/0924-07）</b></td>
+          <td class="ok"><b>一阶主因 ✓</b></td></tr>
+      <tr><td>预算分配策略</td><td class="l">窗口时序 / 置信度门控正反双向（E2026-0924-08）</td>
+          <td class="bad">与锐度正交——分配自由度不解决锐度</td></tr>
+    </table>
+  </section>
+
+  <!-- ================ 三 ================ -->
+  <section id="ladder">
+    <h2><span class="no">三</span>主结果 ①：优化预算阶梯（canonical 八臂，coral）</h2>
+    <table>
+      <tr><th class="l">臂</th><th>iters</th><th>锐度 retention</th><th>PSNR_u8</th><th>墙钟（独占）</th></tr>
+      <tr><td class="l">C0（最小预算）</td><td>6.8k</td><td>0.038</td><td>26.03</td><td>370 s</td></tr>
+      <tr class="hl"><td class="l">A3（在线增量）← T@0.15 基准</td><td>20.4k</td><td><b>0.243 ±0.006</b></td><td>26.16</td><td><b>~890 s</b></td></tr>
+      <tr><td class="l">A6（在线增量）</td><td>40.8k</td><td>0.337</td><td>25.26</td><td>1530 s</td></tr>
+      <tr><td class="l"><b>REF（batch 同 init）</b></td><td>30k</td><td class="ok"><b>0.426（上限）</b></td><td>26.46</td><td>1186 s</td></tr>
+      <tr><td class="l">P2 / P3（在线位姿 @20.4k）</td><td>20.4k</td><td>0.104 / 0.092</td><td>23.0 / 22.6</td><td>~855 s</td></tr>
+      <tr><td class="l">QG（loss 自适应停）</td><td>8.4k 即停</td><td class="bad">0.045</td><td>26.03</td><td>442 s</td></tr>
+    </table>
+    <p class="cap">预算阶梯与位姿×预算交互；QG 负结果：光度 loss 平台 ≠ 锐度平台。</p>
+    <figure>
+      <img src="assets/video_budget_ladder_coral.gif" alt="coral 预算阶梯渲染对比动图">
+      <figcaption>同一帧在不同预算下的渲染演化（C0→A3→A6 vs batch 上限）。</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/video_time_evolution_Ax6_coral.gif" alt="A6 建图时间演化动图">
+      <figcaption>增量建图随时间推进的渲染演化（chunk 检查点序列）——"采集即建"的直观形态。</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/video_budget_ladder_aqualoc.gif" alt="AQUALOC 预算阶梯动图">
+      <figcaption><b>跨场景复现</b>：AQUALOC（441 帧）预算-响应形态一致：retention
+        0.141→0.220→0.337，PSNR_u8 19.0→34.5，T@0.15 = 354 s——结论不依赖单一场景。</figcaption>
+    </figure>
+  </section>
+
+  <!-- ================ 四 ================ -->
+  <section id="metric">
+    <h2><span class="no">四</span>主结果 ②：免 GT 米制化（AQUALOC）</h2>
+    <div class="card">
+      <p>离线 COLMAP 只给<b>任意尺度</b>的轨迹（SE3-ATE 1.676 m，尺度差 43%）。本项目用
+      DIRECT 深度做<b>全局单参数定标</b> s_d = median(z/z_direct)（33 万深度观测，全程无真值参与），
+      一步把轨迹拉回米制：</p>
+      <p style="font-size:17px"><b>SE3-ATE：1.676 m → 0.578 m（−65.5%）</b>，
+      sim3_scale 0.57 → 0.95 ≈ 1（与压力计独立米制源交叉验证）。</p>
+      <p>SE3 ≈ Sim3（0.578 ≈ 0.568）意味着<b>米制版免费达到了免尺度版的形状质量</b>——
+      机制是 1 参数定标即达标（联合 BA 在定标初值上零移动）。
+      <span class="dim">边界：505/1529 帧注册覆盖、离线、单序列（E2026-0921-18）。</span></p>
+    </div>
+    <figure>
+      <img src="assets/aqualoc_traj.jpg" alt="AQUALOC 轨迹顶视图：raw vs 米制">
+      <figcaption>轨迹顶视图（SE3 对齐、不拟合尺度）：黑 = 压力计米制 GT，红 = COLMAP 原始（尺度漂移），
+        绿 = DIRECT 全局定标后——绿线贴住黑线。</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/aqualoc_err.jpg" alt="逐帧 ATE 误差曲线">
+      <figcaption>逐帧对齐误差（n=505 注册帧）：红 = raw（尾部漂到 3.4 m），绿 = 米制（全程 &lt;1.2 m）。</figcaption>
+    </figure>
+  </section>
+
+  <!-- ================ 五 ================ -->
+  <section id="guided">
+    <h2><span class="no">五</span>主结果 ③：双输出导引有限计算（E2026-0924-08）</h2>
+    <p>用 DIRECT 深度的<b>多视角一致性</b>作为逐高斯置信度（conf），门控 densify——
+    "把有限计算导向几何上可信的区域"。固定 20.4k 预算三臂对照：</p>
+    <table>
+      <tr><th class="l">臂 @20.4k</th><th>retention</th><th>PSNR_u8</th><th>高斯数</th><th>墙钟</th></tr>
+      <tr><td class="l">A3 基准（增量，官方窗）</td><td>0.243</td><td>26.16</td><td>1.50M</td><td>~890 s</td></tr>
+      <tr><td class="l">REF20（batch 锚）</td><td>0.302</td><td>26.53</td><td>1.55M</td><td>864 s</td></tr>
+      <tr><td class="l">OPEN（增量，全窗）</td><td>0.231</td><td>26.31</td><td>1.29M</td><td>901 s</td></tr>
+      <tr class="hl"><td class="l"><b>GATE（conf≥p50 门控）</b></td><td>0.221</td><td class="ok"><b>26.41</b></td>
+          <td class="ok"><b>1.06M（−29%）</b></td><td>878 s</td></tr>
+      <tr><td class="l">GATE_INV（反向门控）</td><td>0.222</td><td>26.26</td><td>1.22M</td><td>877 s</td></tr>
+    </table>
+    <p><b>判读</b>：画质轴证伪——正反门控同结果（conf 与锐度正交），所有在线分配变体
+    均低于 batch 等预算锚；<b>压缩轴成立——GATE 以 −29% 高斯换 +0.25dB PSNR</b>
+    （渲染加速/表示压缩，与 J-init 的 −37% 方向可叠加）。</p>
+    <figure>
+      <img src="assets/cmp_final.png" alt="各臂终态渲染对比">
+      <figcaption>终态渲染对比：GT 参照 / C0 / A3 / GATE（同预算更紧凑）/ A6 / REF（batch 上限）。</figcaption>
+    </figure>
+
+    <h3>工程压缩阶梯（E2026-0924-09，全部实测渲染基准）</h3>
+    <table>
+      <tr><th class="l">配置 @20.4k</th><th>retention</th><th>PSNR_u8</th><th>高斯数</th><th>可见高斯</th><th>渲染 FPS</th><th>VRAM</th></tr>
+      <tr><td class="l">L0 基线（e28 复刻 A3 ✓）</td><td>0.232</td><td>26.06</td><td>1.512M</td><td>486k</td><td>208</td><td>3219MB</td></tr>
+      <tr><td class="l">L1 + J 外观 init</td><td>0.231</td><td>25.93</td><td>1.336M</td><td>438k</td><td>226</td><td>3088MB</td></tr>
+      <tr class="hl"><td class="l"><b>L2 + conf 门控 p50（推荐）</b></td><td><b>0.236</b></td><td><b>26.09</b></td>
+          <td><b>1.204M（−20%）</b></td><td><b>415k</b></td><td><b>240（+15%）</b></td><td><b>2979MB</b></td></tr>
+      <tr><td class="l">L3 + p75（过度压缩）</td><td>0.213</td><td>25.97</td><td>1.158M</td><td>399k</td><td>247</td><td>2937MB</td></tr>
+      <tr><td class="l">REF batch（效率前沿）</td><td>0.426</td><td>26.46</td><td>1.552M</td><td><b>329k</b></td><td><b>254</b></td><td>3157MB</td></tr>
+    </table>
+    <p class="dim">渲染基准协议：同 GPU / 同 25 test 视图 / 同渲染器，warmup 10 轮计 50 轮；
+    可见高斯 = radii&gt;0 均值。注记：REF 总高斯更多却更快——可见高斯少 32%，
+    FPS 跟着可见高斯走；增量臂的壳层冗余是"看得见的负担"。
+    延迟 densify 调度（E2026-0924-09 双臂，含窗长对齐的 SHIFT）均无收益：
+    固定预算下"何时开始生长"不是杠杆。</p>
+    <div class="note"><b>锐度三部曲（结构性结论）</b>：① QG 负结果——光度 loss 平台与锐度平台解耦；
+    ② 暖启动判别——对收敛模型重开 densify/prune/reset 窗 = +1.3dB PSNR 换 −0.10 锐度，
+    封闭精化仅缓升，两路均达不到 batch 上限；③ 分配正交——窗口时序与置信度门控
+    （正/反）都不动锐度。<b>结论：锐度是在早期全视野监督下的 densify 生长中形成的
+    （"grown, not recovered"），在线系统的预算应花在早期，而非事后精修或再分配。</b></div>
+  </section>
+
+  <!-- ================ 六 ================ -->
+  <section id="ledger">
+    <h2><span class="no">六</span>在线 vs 离线：Time-to-Map 的账</h2>
+    <table>
+      <tr><th class="l" style="width:24%">维度</th><th class="l">在线增量（本项目）</th><th class="l">离线参照</th></tr>
+      <tr><td class="l">首个达标地图 T@0.15</td><td class="ok"><b>698 s</b>（采集即建，边走边出图）</td>
+          <td>须全量数据到齐：COLMAP 数小时 + 训练 ~20 min</td></tr>
+      <tr><td class="l">PSNR_u8</td><td>26.16（A3）/ 26.41（GATE）</td>
+          <td>26.46（REF batch 30k）/ ≈26.8（经典 COLMAP 管线，E2026-0921-17 参照）</td></tr>
+      <tr><td class="l">锐度 retention</td><td>0.243（A3）/ 0.337（A6，1530 s）</td>
+          <td class="bad">0.426（REF 30k）——诚实差距，机制见第五节</td></tr>
+      <tr><td class="l">地图大小 / 渲染速度</td><td class="ok"><b>1.20M 高斯，240 FPS（L2，−20%/+15% 实测）</b></td><td>1.50M，210 FPS（A3 口径）</td></tr>
+      <tr><td class="l">米制（GT-free）</td><td class="ok">✅ ATE 0.578 m（−65.5%）</td>
+          <td class="bad">❌ COLMAP 无绝对尺度（SE3-ATE 1.676 m）</td></tr>
+      <tr><td class="l">浑水鲁棒性</td><td class="ok">✅ 免 SfM</td>
+          <td class="bad">SfM 易碎：E2026-0923-03 实测 1529 帧仅 505 帧注册为单组件</td></tr>
+      <tr><td class="l">预算可调</td><td class="ok">阶梯即旋钮（0.038→0.337，随时停）</td><td>固定 30k 全量</td></tr>
+    </table>
+    <p><b>优势一句话</b>：不是渲染质量超过离线——PSNR 打平（99%），锐度有结构性差距；
+    赢在<b>时间轴（采集即建 vs 到齐再建）、米制（离线 COLMAP 给不了）、浑水鲁棒
+    （免 SfM）、预算可控、地图更紧凑</b>。这是"在线系统"对"离线管线"的差异化定位，
+    而非刷离线质量榜。</p>
+  </section>
+
+  <!-- ================ 七 ================ -->
+  <section id="conclusion">
+    <h2><span class="no">七</span>结论与边界</h2>
+    <div class="card">
+      <p>① 在线增量 3DGS 的质量一阶杠杆是<b>优化预算</b>（不是深度模型精度，不是位姿精度，
+      不是分配策略）；位姿是预算解锁后的第二瓶颈。② DIRECT 双输出的实证价值 =
+      <b>几何初始化桥 + 表示压缩调度器 + 米制源</b>（ATE −65.5%），而非画质提升。
+      ③ 增量→batch 存在 ~0.06 的结构性锐度税，事后不可恢复——这是在线 3DGS 系统设计的
+      方向性约束。</p>
+    </div>
+    <div class="quote"><b>正式措辞（引用请逐字）</b>：<br>
+      在 DIRECT D-init + 在线位姿 + 增量 3DGS 条件下，系统地测得优化预算是早期地图质量的一阶因素；
+      位姿质量在预算提升后成为进一步限制因素；若干直觉上的 depth/fusion/densification
+      调整未显示同量级收益。<span class="dim">（不声称"解决了水下 3DGS 核心难点"。）</span></div>
+    <p class="dim">诚实条目：主结论在 coral（170 帧，单场景）；AQUALOC 复现预算-响应趋势
+    （441 帧，未跑完整 canonical）。增量建图为 near-online（170 帧约 15 分钟），
+    非 real-time。GATE−OPEN 差 0.010 属边缘，以反向门控机制判别兜底（非 seed 复核）。
+    E2026-0924-06 前的 legacy 数字已按更正记录降级，本页不引用。canonical 数据原件见
+    <a href="#data">本仓库 data/</a>；排除链证据：E2026-0923-02 · E2026-0923-05 · E2026-0924-06/07/08。</p>
+  </section>
+
+  <!-- ================ 附录 ================ -->
+  <section id="appx">
+    <h2><span class="no">附</span>附录：跨域迁移与双输出分支判决</h2>
+
+    <h3>A · 配方跨域迁移（SeaThruNeRF，E2026-0923-01）</h3>
+    <figure>
+      <img src="assets/cmp_ladder_zoom.jpg" alt="SeaThruNeRF 五档阶梯局部放大对比">
+      <figcaption>JapaneseGradens 五档阶梯局部放大：GT / D3 vanilla / D3 supenc / A2f supenc+sup /
+        D3 union（联合 init）/ D3 union+sup。<b>D3 联合 init 三指标全臂最优</b>
+        （PSNR 22.36 / SSIM 0.865 / LPIPS 0.199）；点数对照拆解混淆：组成效应 ~+0.7dB /
+        点数 ~+0.5dB；四场景宏平均 25.81（A0 25.32 / A2f 26.35 / SeaSplat 26.56）；
+        深度监督臂跨域弱（D4）。</figcaption>
+    </figure>
+
+    <h3>B · J 分支判决（coral 2×2 + 路由臂，E2026-0923-02）</h3>
+    <figure>
+      <img src="assets/cmp_2x2_clean.jpg" alt="J 去浊外观能力对比">
+      <figcaption>clean 分支渲染：J（DIRECT 去浊参照）/ B / D。四臂 under 保真五跑 PSNR 全在
+        噪声带（27.19–27.36），路由臂双 seed 亦不可分辨——<b>J 对几何保真/锐度无可分辨效应，
+        但去浊外观能力成立</b>；DIRECT 三维价值集中于深度分支。</figcaption>
+    </figure>
+  </section>
+
+  <!-- ================ 数据 ================ -->
+  <section id="data">
+    <h2><span class="no">数</span>canonical 数据原件（data/）</h2>
+    <table>
+      <tr><th class="l">文件</th><th class="l">内容</th><th class="l">来源</th></tr>
+      <tr><td class="l"><code>canonical_analysis.json</code></td><td class="l">预算阶梯八臂：retention / PSNR / 质量门达线时刻 / 独占墙钟</td><td class="l">E2026-0924-07</td></tr>
+      <tr><td class="l"><code>retention.json</code></td><td class="l">调度格点七变体 + 压缩阶梯逐检查点曲线（retention/PSNR/高斯数/墙钟）</td><td class="l">E2026-0924-09</td></tr>
+      <tr><td class="l"><code>bench.json</code></td><td class="l">渲染基准三件套：FPS / 可见高斯 / peak VRAM（六模型同卡实测）</td><td class="l">E2026-0924-07/09</td></tr>
+      <tr><td class="l"><code>ate_e18b_metric_ba.json</code></td><td class="l">AQUALOC 米制化：SE3/Sim3 ATE、sim3_scale（原始值 0.5775 m）</td><td class="l">E2026-0921-18</td></tr>
+    </table>
+  </section>
+
+</div></main>
+
+<footer>
+  <div class="wrap">
+    冻结于 2026-09-24 · 实验记录 E2026-0918-10 … E2026-0924-09（预注册 + oracle 对照 + 双 seed 纪律）。
+    本仓库只承载展示层；完整证据链（实验记录、协议、日志）在项目内部档案。
+  </div>
+</footer>
+</body>
+</html>
