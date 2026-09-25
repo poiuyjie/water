@@ -49,7 +49,8 @@
 - 🌐 **完整报告页（GitHub Pages）**：<https://poiuyjie.github.io/water/> ——
   双输出用法 → 调参经验 → Time-to-Map → 米制化 → 压缩 → 在线 vs 离线账本，全部图表与视频。
 - ▶ **全序列渲染视频**：[flythrough_fullseq.mp4](docs/assets/flythrough_fullseq.mp4)
-  （1017 帧完整采集轨迹，定稿配方模型逐帧渲染，50s）
+  （1017 帧完整采集轨迹，定稿配方模型逐帧渲染，50s）；
+  页面上还有它的对照——**在线增量 698s 建出的地图本体**（flythrough_online_A3.mp4）。
 - 📊 **结果数据原件**：[`data/`](data/) —— 预算阶梯 / retention 曲线 / 渲染基准 / ATE 原始 JSON。
 
 ## 边界（诚实条目）
