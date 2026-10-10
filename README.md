@@ -8,7 +8,12 @@
 上：常规 SLAM 位姿直接喂 3DGS（概览级）；下：光度一致位姿 + 双输出联合 init（高质量）。
 位姿的局部光度一致性是水下 3DGS 画质的第一张入场券。
 
-## 双输出模型（DIRECT：D 深度 + J 去浊）怎么用
+<p align="center">
+  <video src="docs/assets/flythrough_fullseq.mp4" poster="docs/assets/video_poster.jpg" controls width="800"></video>
+</p>
+<p align="center"><sub>↑ 主交付 · 全序列 150k 步 · 1017 帧 · ~100 s · E-2026-1007-05（2026-10 增补）</sub></p>
+
+## 🛰️ 双输出模型（DIRECT：D 深度 + J 去浊）怎么用
 
 | 分支 | 用法 | 效果 |
 |------|------|------|
@@ -17,7 +22,7 @@
 | **D 深度** | **压缩调度器**：深度多视角一致性 = 逐高斯置信度，门控 densify | **高斯 −20.4% / 渲染 FPS +15.3%（实测 208→240）**，质量持平 |
 | **J 去浊** | **外观初始化 / 紧凑化** | 同 PSNR 高斯更少（低预算档 −37%）；**做几何监督无效** |
 
-## 核心结果（2026-09 冻结 · 2026-10 增补全序列 150k 步预算响应）
+## 📊 核心结果（2026-09 冻结 · 2026-10 增补全序列 150k 步预算响应）
 
 | # | 结果 | 数字 |
 |---|------|------|
@@ -36,7 +41,7 @@
 
 不声称"解决了水下 3DGS 核心难点"。
 
-## 调参经验（在线水下 3DGS 的杠杆排序）
+## ⚙️ 调参经验（在线水下 3DGS 的杠杆排序）
 
 1. **优化预算是一阶杠杆**——深度精度/时序一致性/写入策略/预算分配都是二阶；预算 = "质量-时间"旋钮。
 2. **预算花在早期**：锐度在早期全视野 densify 中长出（grown, not recovered）；重开窗 = +1.3dB 换 −0.10 锐度，亏本。
@@ -45,16 +50,19 @@
 5. **FPS 跟可见高斯走**：总高斯 −20% → 可见 −14% → FPS +15%；batch 地图可见少 32% → FPS +21%。
 6. **早停看 retention 不看 loss**：PSNR 很早就平台化，锐度还在长——按 loss 早停会停在 0.045（可达 0.243）。
 
-## 导览
+## 🎬 导览
 
 - 🌐 **完整报告页（GitHub Pages）**：<https://poiuyjie.github.io/water/> ——
   双输出用法 → 调参经验 → Time-to-Map → 米制化 → 压缩 → 在线 vs 离线账本，全部图表与视频。
-- ▶ **全序列渲染视频（10 月增补）**：[flythrough_fullseq.mp4](docs/assets/flythrough_fullseq.mp4)
-  （1017 帧完整轨迹，**150k 步预算响应后的全序列渲染**，best 段 + GT 对比，~100 s @ 9.97 fps）；
-  9 月版存档未保留；对照——**在线增量 698 s 建出的地图本体**（flythrough_online_A3.mp4）。
+- ▶ **对照：在线 698 s 增量建出的地图本体**（`flythrough_online_A3.mp4`）
+
+<p align="center">
+  <video src="docs/assets/flythrough_online_A3.mp4" poster="docs/assets/video_poster_online.jpg" controls width="800"></video>
+</p>
+
 - 📊 **结果数据原件**：[`data/`](data/) —— 预算阶梯 / retention 曲线 / 渲染基准 / ATE 原始 JSON。
 
-## 边界（诚实条目）
+## ⚠️ 边界（诚实条目）
 
 - 主结论在 coral 浑水序列（170 帧，单场景）；AQUALOC（441 帧）复现预算-响应趋势。
 - 在线建图为 near-online（170 帧约 15 分钟），非 real-time。
