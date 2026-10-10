@@ -47,8 +47,6 @@
   <video src="docs/assets/flythrough_online_A3.mp4" poster="docs/assets/video_poster_online.jpg" controls width="800"></video>
 </p>
 
-- 📊 **结果数据原件**：[`data/`](data/) —— 预算阶梯 / retention 曲线 / 渲染基准 / ATE 原始 JSON。
-
 ## ⚠️ 边界（诚实条目）
 
 - 主结论在 coral 浑水序列（170 帧，单场景）；AQUALOC（441 帧）复现预算-响应趋势。
