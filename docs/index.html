@@ -284,83 +284,19 @@
   <!-- ================ 04 ================ -->
   <section id="ladder">
     <div class="sec-head reveal"><span class="sec-no">04</span>
-      <h2>主结果 ①：Time-to-Map 与预算旋钮</h2>
-      <p class="sec-sub">coral 浑水关键帧序列，170 帧，独占 GPU 计时。</p></div>
+      <h2>主结果 ①：我们 vs SfM</h2>
+      <p class="sec-sub">coral 浑水全序列（889 训练 + 128 评测）vs SfM 离线参照（E-2026-1007-05）。</p></div>
     <table class="reveal">
-      <tr><th class="l">配置</th><th>训练 iters</th><th>锐度 retention</th><th>PSNR_u8</th><th>墙钟（独占）</th></tr>
-      <tr><td class="l">最小预算</td><td>6.8k</td><td>0.038</td><td>26.03</td><td>370 s</td></tr>
-      <tr class="hl"><td class="l">在线推荐档 ← <b>T@0.15 = 698 s</b></td><td>20.4k</td><td><b>0.243 ±0.006</b></td><td>26.16</td><td><b>~890 s</b></td></tr>
-      <tr><td class="l">高预算档</td><td>40.8k</td><td>0.337</td><td>25.26</td><td>1530 s</td></tr>
-      <tr><td class="l"><b>同 init 离线 batch（上限参照）</b></td><td>30k</td><td class="ok"><b>0.426</b></td><td>26.46</td><td>1186 s</td></tr>
-      <tr><td class="l">换用在线位姿 @20.4k</td><td>20.4k</td><td>0.104 / 0.092</td><td>23.0 / 22.6</td><td>~855 s</td></tr>
-      <tr><td class="l">按 loss 平台早停</td><td>8.4k 即停</td><td class="bad">0.045</td><td>26.03</td><td>442 s</td></tr>
+      <tr><th class="l">配置</th><th>PSNR_u8</th><th>Lap</th><th>高斯数</th></tr>
+      <tr class="hl"><td class="l"><b>我们 · E-2026-1007-05（全序列 150k 步）</b></td><td><b>31.66</b></td><td><b>10.56</b></td><td><b>833k</b></td></tr>
+      <tr><td class="l">SfM 参照（offline batch）</td><td>27.57</td><td>12.61</td><td>912k</td></tr>
     </table>
-    <p class="cap">预算 = 质量-时间旋钮：在 0.038–0.337 之间随取随停；"换在线位姿"行说明位姿等级在低预算下无关紧要、预算解锁后才成为天花板。早停行是教训 ⑥ 的实测。</p>
-    <figure class="reveal">
-      <div class="fgrid f5">
-        <div class="cell"><img src="assets/frames/ladder_c0.jpg" alt="最小预算渲染"><b>最小预算 6.8k<br><i>ret 0.038 · 26.03 dB · 370 s</i></b></div>
-        <div class="cell"><img src="assets/frames/ladder_a3.jpg" alt="在线推荐档渲染"><b>在线推荐档 20.4k<br><i>ret 0.243 · 26.16 dB · ~890 s</i></b></div>
-        <div class="cell"><img src="assets/frames/ladder_a6.jpg" alt="高预算档渲染"><b>高预算档 40.8k<br><i>ret 0.337 · 25.26 dB · 1530 s</i></b></div>
-        <div class="cell"><img src="assets/frames/ladder_ref.jpg" alt="batch 上限渲染"><b>batch 上限 30k<br><i>ret 0.426 · 26.46 dB · 1186 s</i></b></div>
-        <div class="cell"><img src="assets/frames/ladder_gt.jpg" alt="真值"><b>GT 真值参照</b></div>
-      </div>
-      <figcaption><b>预算阶梯 · 同一 held-out 视图（canonical 渲染）</b>：预算从 6.8k 提到 40.8k，
-      细节密度单调上升，batch 上限仍最高——"预算即画质旋钮"的直接可视化。</figcaption>
-    </figure>
-    <figure class="reveal">
-      <div class="fgrid f3">
-        <div class="cell"><img src="assets/frames/evo_ck01.jpg" alt="1.2k iters 渲染"><b>ck01 · 1.2k iters · t ≈ 53 s</b></div>
-        <div class="cell"><img src="assets/frames/evo_ck04.jpg" alt="4.8k iters 渲染"><b>ck04 · 4.8k iters · t ≈ 214 s</b></div>
-        <div class="cell"><img src="assets/frames/evo_ck07.jpg" alt="8.4k iters 渲染"><b>ck07 · 8.4k iters · t ≈ 376 s</b></div>
-        <div class="cell"><img src="assets/frames/evo_ck13.jpg" alt="15.6k iters 渲染"><b>ck13 · 15.6k iters · t ≈ 698 s</b></div>
-        <div class="cell"><img src="assets/frames/evo_ck17.jpg" alt="20.4k iters 渲染"><b>ck17 · 20.4k iters · t ≈ 891 s</b></div>
-        <div class="cell"><img src="assets/frames/evo_gt.jpg" alt="真值"><b>GT 真值参照</b></div>
-      </div>
-      <figcaption><b>增量建图演化 · 同一 held-out 视图（canonical A3，代表性检查点）</b>：
-      采集开始 1 分钟只有朦胧结构，随 chunk 推进细节逐步长出，15 分钟收尾——"采集即建、边走边长"的直观形态。</figcaption>
-    </figure>
-    <figure class="reveal">
-      <div class="fgrid f4">
-        <div class="cell"><img src="assets/frames/aqualoc_01.jpg" alt="AQUALOC 6k 渲染"><b>6k iters · ~4 min<br><i>ret 0.141</i></b></div>
-        <div class="cell"><img src="assets/frames/aqualoc_02.jpg" alt="AQUALOC 18k 渲染"><b>18k iters · ~9 min<br><i>ret 0.220</i></b></div>
-        <div class="cell"><img src="assets/frames/aqualoc_03.jpg" alt="AQUALOC 30k 上限渲染"><b>30k 上限 · ~16 min<br><i>ret 0.337</i></b></div>
-        <div class="cell"><img src="assets/frames/aqualoc_04.jpg" alt="AQUALOC 真值"><b>GT 真值参照</b></div>
-      </div>
-      <figcaption><b>跨场景复现（AQUALOC，441 帧）</b>：预算-响应形态与 coral 一致：
-      ret 0.141→0.220→0.337，PSNR_u8 19.0→34.5，T@0.15 = 354 s——结论不依赖单一场景。</figcaption>
-    </figure>
   </section>
 
   <!-- ================ 05 ================ -->
-  <section id="metric">
-    <div class="sec-head reveal"><span class="sec-no">05</span>
-      <h2>主结果 ②：免 GT 米制化（AQUALOC）</h2>
-      <p class="sec-sub">离线 COLMAP 只给任意尺度的轨迹；一个参数把轨迹拉回米制，全程无真值参与。</p></div>
-    <div class="card reveal">
-      <p>离线 COLMAP 只给<b>任意尺度</b>的轨迹（SE3-ATE 1.676 m，尺度差 43%）。用
-      DIRECT 深度做<b>全局单参数定标</b> s_d = median(z/z_direct)（33 万深度观测，全程无真值参与），
-      一步把轨迹拉回米制：</p>
-      <p style="font-size:19px"><b>SE3-ATE：1.676 m → 0.578 m（−65.5%）</b>
-      <span style="color:var(--faint)">　·　sim3_scale 0.57 → 0.95 ≈ 1（与压力计独立米制源交叉验证）</span></p>
-      <p>SE3 ≈ Sim3（0.578 ≈ 0.568）意味着<b>米制版免费达到了免尺度版的形状质量</b>——
-      机制是 1 参数定标即达标（联合 BA 在定标初值上零移动）。
-      <span class="dim">边界：505/1529 帧注册覆盖、离线、单序列。</span></p>
-    </div>
-    <figure class="reveal">
-      <img src="assets/aqualoc_traj.jpg" alt="AQUALOC 轨迹顶视图：raw vs 米制">
-      <figcaption>轨迹顶视图（SE3 对齐、不拟合尺度）：黑 = 压力计米制 GT，红 = COLMAP 原始（尺度漂移），
-        绿 = DIRECT 全局定标后——绿线贴住黑线。</figcaption>
-    </figure>
-    <figure class="reveal">
-      <img src="assets/aqualoc_err.jpg" alt="逐帧 ATE 误差曲线">
-      <figcaption>逐帧对齐误差（n=505 注册帧）：红 = raw（尾部漂到 3.4 m），绿 = 米制（全程 &lt;1.2 m）。</figcaption>
-    </figure>
-  </section>
-
-  <!-- ================ 06 ================ -->
   <section id="compress">
-    <div class="sec-head reveal"><span class="sec-no">06</span>
-      <h2>主结果 ③：D 置信度导引的表示压缩</h2>
+    <div class="sec-head reveal"><span class="sec-no">05</span>
+      <h2>主结果 ②：表示压缩（D 置信度导引）</h2>
       <p class="sec-sub">深度的多视角一致性 = 逐高斯置信度；它不提画质，但同质量把地图做小做快。</p></div>
     <p>把 DIRECT 深度的<b>多视角一致性</b>变成逐高斯置信度（conf），门控 densify——
     "把有限计算导向几何上可信的区域"。固定 20.4k 预算对照：</p>
@@ -400,7 +336,7 @@
 
   <!-- ================ 07 ================ -->
   <section id="ledger">
-    <div class="sec-head reveal"><span class="sec-no">07</span>
+    <div class="sec-head reveal"><span class="sec-no">06</span>
       <h2>在线 vs 离线：Time-to-Map 的账</h2>
       <p class="sec-sub">不是刷离线质量榜——在线系统赢在时间轴、米制、鲁棒与可控性。</p></div>
     <table class="reveal">
@@ -431,7 +367,7 @@
 
   <!-- ================ 08 ================ -->
   <section id="conclusion">
-    <div class="sec-head reveal"><span class="sec-no">08</span>
+    <div class="sec-head reveal"><span class="sec-no">07</span>
       <h2>结论与边界</h2>
       <p class="sec-sub">三条可复述的结论，和一条不越界的措辞。</p></div>
     <div class="card reveal">
