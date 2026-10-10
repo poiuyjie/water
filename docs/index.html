@@ -167,7 +167,7 @@
 <nav><div class="wrap">
   <span class="brand">water<b>·</b>Time-to-Map</span>
   <a href="#goal">研究目标</a><a href="#dual">双输出用法</a><a href="#tuning">调参经验</a>
-  <a href="#ladder">Time-to-Map</a><a href="#metric">米制化</a><a href="#compress">压缩</a>
+  <a href="#ladder">Time-to-Map</a><a href="#ledger">对比</a><a href="#conclusion">结论</a>
   <a href="#ledger">在线vs离线</a><a href="#conclusion">结论</a><a href="#data">数据</a>
 </div></nav>
 
@@ -175,16 +175,16 @@
   <div class="kicker">UNDERWATER 3D GAUSSIAN SPLATTING</div>
   <h1>水下 3DGS 建图系统<br><span class="grad">Time-to-Map</span></h1>
   <p class="lede">在保证地图质量的前提下，<b>最小化「水下视频 → 可用 3DGS 地图」的时间</b>——
-     免离线 COLMAP，浑水边采集边建图，免 GT 米制尺度。
-     把双输出模型（DIRECT：<b>D 深度</b> + <b>J 去浊</b>）用到初始化、米制、压缩三个关键位置。
-     数字为 2026-09 冻结口径（官方 u8-PSNR，独占 GPU 计时），coral 浑水（170 帧）与 AQUALOC 港湾（441 帧）双场景验证。</p>
+     免离线 COLMAP，浑水边采集边建图。
+     把双输出模型（DIRECT：<b>D 深度</b> + <b>J 去浊</b>）用到初始化与置信度导引。
+     数字为 2026-09 冻结 · 2026-10 增补（E-2026-1007-05 全序列 150k 步）官方 u8-PSNR。</p>
 
   <div class="stats">
     <div class="stat"><b>698 s</b><span>T@0.15 达标墙钟<br>（170 帧，含推理与评测）</span></div>
     <div class="stat"><b class="long">0.038 → 0.243 → 0.337</b><span>优化预算旋钮的锐度响应<br>（离线上限 0.426 的 79%）</span></div>
-    <div class="stat"><b>−20% · +15%</b><span>高斯压缩 / 渲染 FPS<br>（D-conf 导引，同卡实测 208→240）</span></div>
-    <div class="stat"><b>−65.5%</b><span>免 GT 米制化 ATE<br>（AQUALOC 1.676→0.578 m）</span></div>
-    <div class="stat"><b>2 场景</b><span>coral 浑水 + AQUALOC 港湾<br>响应形态一致</span></div>
+    <div class="stat"><b>PSNR +4.09 dB</b><span>我们 vs SfM<br>31.66 vs 27.57</span></div>
+    <div class="stat"><b>Lap −2.05</b><span>我们 vs SfM<br>10.56 vs 12.61</span></div>
+    <div class="stat"><b>高斯 −8.6%</b><span>我们 vs SfM<br>833k vs 912k</span></div>
   </div>
 
   <div class="screen">
@@ -228,7 +228,7 @@
         把任意尺度的轨迹一步拉回米制——<b>离线 SfM 给不了的东西</b>。</p></div>
       <div class="use reveal"><span class="tag">D · 深度</span><b class="t">表示压缩调度器</b>
         <p>深度的多视角一致性 = 逐高斯置信度，用它门控 densify：
-        <b>−20% 高斯 / +15% 渲染 FPS，质量持平</b>（详见<a href="#compress">压缩一节</a>）。</p></div>
+        <b>−20% 高斯 / +15% 渲染 FPS，质量持平</b>（压缩细节已收入 E-09 报告）。</p></div>
       <div class="use reveal"><span class="tag j">J · 去浊</span><b class="t">外观初始化 / 紧凑化</b>
         <p>去浊图像作外观 init：同 PSNR 下高斯更少（低预算档 <b>−37%</b>）。
         实测 J 做<b>几何监督无效</b>——J 的价值在外观与紧凑性，不在几何。</p></div>
@@ -294,49 +294,9 @@
   </section>
 
   <!-- ================ 05 ================ -->
-  <section id="compress">
-    <div class="sec-head reveal"><span class="sec-no">05</span>
-      <h2>主结果 ②：表示压缩（D 置信度导引）</h2>
-      <p class="sec-sub">深度的多视角一致性 = 逐高斯置信度；它不提画质，但同质量把地图做小做快。</p></div>
-    <p>把 DIRECT 深度的<b>多视角一致性</b>变成逐高斯置信度（conf），门控 densify——
-    "把有限计算导向几何上可信的区域"。固定 20.4k 预算对照：</p>
-    <table class="reveal">
-      <tr><th class="l">配置 @20.4k</th><th>retention</th><th>PSNR_u8</th><th>高斯数</th><th>墙钟</th></tr>
-      <tr><td class="l">增量基准（官方窗）</td><td>0.243</td><td>26.16</td><td>1.50M</td><td>~890 s</td></tr>
-      <tr><td class="l">batch 等预算参照</td><td>0.302</td><td>26.53</td><td>1.55M</td><td>864 s</td></tr>
-      <tr><td class="l">增量，全窗 densify</td><td>0.231</td><td>26.31</td><td>1.29M</td><td>901 s</td></tr>
-      <tr class="hl"><td class="l"><b>conf≥p50 门控（本项目）</b></td><td>0.221</td><td class="ok"><b>26.41</b></td>
-          <td class="ok"><b>1.06M（−29%）</b></td><td>878 s</td></tr>
-      <tr><td class="l">反向门控（对照）</td><td>0.222</td><td>26.26</td><td>1.22M</td><td>877 s</td></tr>
-    </table>
-    <p><b>判读</b>：conf 门控<b>不提升画质</b>——正反门控同结果（conf 与锐度正交）；
-    <b>它的价值在压缩轴：−29% 高斯换 +0.25dB PSNR</b>，直接兑现为渲染加速与表示体积。</p>
-    <figure class="reveal">
-      <img src="assets/cmp_final.png" alt="各配置终态渲染对比">
-      <figcaption>终态渲染对比：GT 参照 / 最小预算 / 在线推荐档 / conf 门控（同预算更紧凑）/ 高预算 / batch 上限。</figcaption>
-    </figure>
-
-    <h3>工程压缩阶梯（全部实测渲染基准）</h3>
-    <table class="reveal">
-      <tr><th class="l">配置 @20.4k</th><th>retention</th><th>PSNR_u8</th><th>高斯数</th><th>可见高斯</th><th>渲染 FPS</th><th>VRAM</th></tr>
-      <tr><td class="l">L0 基线</td><td>0.232</td><td>26.06</td><td>1.512M</td><td>486k</td><td>208</td><td>3219MB</td></tr>
-      <tr><td class="l">L1 + J 外观 init</td><td>0.231</td><td>25.93</td><td>1.336M</td><td>438k</td><td>226</td><td>3088MB</td></tr>
-      <tr class="hl"><td class="l"><b>L2 + conf 门控 p50（推荐）</b></td><td><b>0.236</b></td><td><b>26.09</b></td>
-          <td><b>1.204M（−20%）</b></td><td><b>415k</b></td><td><b>240（+15%）</b></td><td><b>2979MB</b></td></tr>
-      <tr><td class="l">L3 + p75（过度压缩）</td><td>0.213</td><td>25.97</td><td>1.158M</td><td>399k</td><td>247</td><td>2937MB</td></tr>
-      <tr><td class="l">batch 上限参照</td><td>0.426</td><td>26.46</td><td>1.552M</td><td><b>329k</b></td><td><b>254</b></td><td>3157MB</td></tr>
-    </table>
-    <p class="cap">渲染基准协议：同 GPU / 同 25 test 视图 / 同渲染器，warmup 10 轮计 50 轮；
-    可见高斯 = radii&gt;0 均值。J-init 的压缩收益随预算提高而收缩（6.8k 档 −37% → 20.4k 档 −12%），
-    与 conf 门控叠加后总压缩 −20%；p75 过度（retention −0.019）。</p>
-    <div class="note reveal"><b>一句话机理</b>：在线增量的锐度天花板比 batch 低 ~0.06（结构性锐度税），
-    且<b>事后不可恢复</b>——重开 densify、延迟生长、重新分配预算、conf 门控都不动锐度。
-    设计在线 3DGS 系统时，把预算花在早期生长，把压缩交给置信度门控。</div>
-  </section>
-
   <!-- ================ 07 ================ -->
   <section id="ledger">
-    <div class="sec-head reveal"><span class="sec-no">06</span>
+    <div class="sec-head reveal"><span class="sec-no">05</span>
       <h2>在线 vs 离线：Time-to-Map 的账</h2>
       <p class="sec-sub">不是刷离线质量榜——在线系统赢在时间轴、米制、鲁棒与可控性。</p></div>
     <table class="reveal">
@@ -367,7 +327,7 @@
 
   <!-- ================ 08 ================ -->
   <section id="conclusion">
-    <div class="sec-head reveal"><span class="sec-no">07</span>
+    <div class="sec-head reveal"><span class="sec-no">06</span>
       <h2>结论与边界</h2>
       <p class="sec-sub">三条可复述的结论，和一条不越界的措辞。</p></div>
     <div class="card reveal">
