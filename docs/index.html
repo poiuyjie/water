@@ -166,9 +166,7 @@
 
 <nav><div class="wrap">
   <span class="brand">water<b>·</b>Time-to-Map</span>
-  <a href="#goal">研究目标</a><a href="#dual">双输出用法</a><a href="#tuning">调参经验</a>
-  <a href="#ladder">Time-to-Map</a><a href="#ledger">对比</a><a href="#conclusion">结论</a>
-  <a href="#ledger">在线vs离线</a><a href="#conclusion">结论</a><a href="#data">数据</a>
+  <a href="#goal">研究目标</a><a href="#dual">双输出用法</a><a href="#ladder">主结果</a><a href="#ledger">对比</a><a href="#conclusion">结论</a><a href="#data">数据</a>
 </div></nav>
 
 <header class="hero"><div class="wrap">
@@ -176,7 +174,7 @@
   <h1>水下 3DGS 建图系统<br><span class="grad">Time-to-Map</span></h1>
   <p class="lede">在保证地图质量的前提下，<b>最小化「水下视频 → 可用 3DGS 地图」的时间</b>——
      免离线 COLMAP，浑水边采集边建图。
-     把双输出模型（DIRECT：<b>D 深度</b> + <b>J 去浊</b>）用到初始化与置信度导引。
+     把 DIRECT 深度分支用于初始化与置信度导引。
      数字为 2026-09 冻结 · 2026-10 增补（E-2026-1007-05 全序列 150k 步）官方 u8-PSNR。</p>
 
   <div class="stats">
@@ -229,61 +227,12 @@
       <div class="use reveal"><span class="tag">D · 深度</span><b class="t">表示压缩调度器</b>
         <p>深度的多视角一致性 = 逐高斯置信度，用它门控 densify：
         <b>−20% 高斯 / +15% 渲染 FPS，质量持平</b>（压缩细节已收入 E-09 报告）。</p></div>
-      <div class="use reveal"><span class="tag j">J · 去浊</span><b class="t">外观初始化 / 紧凑化</b>
-        <p>去浊图像作外观 init：同 PSNR 下高斯更少（低预算档 <b>−37%</b>）。
-        实测 J 做<b>几何监督无效</b>——J 的价值在外观与紧凑性，不在几何。</p></div>
     </div>
-  </section>
-
-  <!-- ================ 03 ================ -->
-  <section id="tuning">
-    <div class="sec-head reveal"><span class="sec-no">03</span>
-      <h2>调参经验：在线水下 3DGS 的杠杆排序</h2>
-      <p class="sec-sub">把有限算力花在哪？按实测杠杆从大到小——这也是本项目的核心 know-how。</p></div>
-
-    <div class="lesson reveal"><span class="n">①</span><div class="b"><b class="h">优化预算是一阶杠杆，其他都是二阶</b>
-      <p>同样的输入，只动训练预算：6.8k → 20.4k → 40.8k iters，锐度 retention
-      <b>0.038 → 0.243 → 0.337</b>（同 init 离线训练上限 0.426）。深度模型精度、深度时序一致性、
-      写入策略、预算怎么分配——<b>都不是杠杆</b>。预算就是"质量-时间"旋钮，可随时停。</p></div></div>
-
-    <div class="lesson reveal"><span class="n">②</span><div class="b"><b class="h">预算要花在早期：锐度是长出来的，不是补回来的</b>
-      <p>锐度在<b>早期全视野 densify 生长</b>中形成。对已收敛模型重开 densify 窗：
-      +1.3dB PSNR 却换 −0.10 锐度；延迟开始 densify、重排训练窗、按置信度正/反向门控——
-      全都不动锐度。<b>在线系统的预算应该花在早期生长，事后精修是亏本买卖。</b></p></div></div>
-
-    <div class="lesson reveal"><span class="n">③</span><div class="b"><b class="h">位姿要"光度一致"，而不只是轨迹准</b>
-      <p>决定渲染是高质量还是概览级的，是位姿的<b>局部逐对光度一致性</b>（重投影 0.2px vs 16px 的差别）；
-      轨迹的米制/形状精度是另一回事，两者独立。米制轨迹喂 3DGS 照样糊，光度一致位姿才出细节：</p></div></div>
-
-    <figure class="reveal">
-      <img src="assets/filmstrip_slam_vs_hq.jpg" alt="位姿光度一致性决定渲染质量">
-      <figcaption><b>同一序列、同一训练器</b>：上 = 常规 SLAM 位姿（概览级，细节丢失）；
-        下 = 光度一致位姿 + 双输出联合 init（高质量）。位姿一致性是水下 3DGS 画质的第一张入场券。</figcaption>
-    </figure>
-
-    <div class="lesson reveal"><span class="n">④</span><div class="b"><b class="h">init 组成：稀疏脚手架 ∪ 深度反投影</b>
-      <p>纯深度反投影 init 缺光度脚手架；<b>稀疏点 ∪ DIRECT 反投影的联合 init</b>
-      在光度一致位姿下恢复离线锐度的 92%。J 外观 init 额外省高斯（预算越紧收益越大：
-      6.8k 档 −37%，20.4k 档 −12%——预算充分后 densify 会回填外观优势）。</p></div></div>
-
-    <div class="lesson reveal"><span class="n">⑤</span><div class="b"><b class="h">渲染 FPS 跟"可见高斯"走，不跟总高斯走</b>
-      <p>总高斯 −20% 只带来可见高斯 −14%、FPS +15%；而 batch 地图总高斯更多、
-      <b>可见高斯少 32%，FPS 反而 +21%</b>。增量建图的壳层冗余是"看得见的负担"——
-      想提速，压的是视野内可见数量。</p></div></div>
-
-    <div class="lesson reveal"><span class="n">⑥</span><div class="b"><b class="h">早停看 retention，别只看 loss / PSNR</b>
-      <p>光度 loss 与 PSNR 很早就平台化，<b>锐度 retention 却还在长</b>——按 loss 平台自适应早停
-      会停在 retention 0.045（vs 同预算可达 0.243）。质量门控必须是渲染口径（PSNR + Laplacian 比）。</p></div></div>
-
-    <div class="recipe reveal"><div class="rt">RECOMMENDED RECIPE · 推荐配方</div>
-      <p>D 逐帧米制反投影 init　+　稀疏 ∪ DIRECT 联合 init　+　J 外观 init　+
-      conf≥p50 门控 densify　+　全局 s_d 定标米制化 ——
-      即压缩阶梯的 <b>L2 推荐档</b>：高斯 −20.4% / FPS +15.3% / VRAM −7.5%，质量持平。</p></div>
   </section>
 
   <!-- ================ 04 ================ -->
   <section id="ladder">
-    <div class="sec-head reveal"><span class="sec-no">04</span>
+    <div class="sec-head reveal"><span class="sec-no">03</span>
       <h2>主结果 ①：我们 vs SfM</h2>
       <p class="sec-sub">coral 浑水全序列（889 训练 + 128 评测）vs SfM 离线参照（E-2026-1007-05）。</p></div>
     <table class="reveal">
@@ -296,7 +245,7 @@
   <!-- ================ 05 ================ -->
   <!-- ================ 07 ================ -->
   <section id="ledger">
-    <div class="sec-head reveal"><span class="sec-no">05</span>
+    <div class="sec-head reveal"><span class="sec-no">04</span>
       <h2>在线 vs 离线：Time-to-Map 的账</h2>
       <p class="sec-sub">不是刷离线质量榜——在线系统赢在时间轴、米制、鲁棒与可控性。</p></div>
     <table class="reveal">
@@ -327,7 +276,7 @@
 
   <!-- ================ 08 ================ -->
   <section id="conclusion">
-    <div class="sec-head reveal"><span class="sec-no">06</span>
+    <div class="sec-head reveal"><span class="sec-no">05</span>
       <h2>结论与边界</h2>
       <p class="sec-sub">三条可复述的结论，和一条不越界的措辞。</p></div>
     <div class="card reveal">
