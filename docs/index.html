@@ -166,7 +166,7 @@
 
 <nav><div class="wrap">
   <span class="brand">water<b>·</b>Time-to-Map</span>
-  <a href="#dual">系统做法</a><a href="#result">主结果</a><a href="#conclusion">总结</a>
+  <a href="#dual">系统做法</a><a href="#result">主结果</a>
 </div></nav>
 
 <header class="hero"><div class="wrap">
@@ -187,7 +187,7 @@
            poster="assets/video_poster.jpg?v=3" src="assets/flythrough_fullseq.mp4?v=1"></video>
     <span class="badge"><i></i>GT vs Ours · 1017 帧 · 点击暂停/播放</span>
   </div>
-  <p class="cap">左：GT；右：我们的重建 · <a href="#result">下面是 698 秒建出来的地图</a></p>
+  <p class="cap">左：GT；右：我们的重建 · <a href="#result">下面是结果对比</a></p>
 </div></header>
 
 <main><div class="wrap">
@@ -221,24 +221,6 @@
     <p class="cap">画质 +4 dB、地图小 8.6%、自带米制；锐度低约 2 分，但首图快了几个小时。</p>
     <p class="cap dim">口径：698 秒为 170 帧在线子集；画质与地图为 1017 帧全序列。</p>
 
-    <h3>698 秒建出来的地图</h3>
-    <div class="screen reveal">
-      <video controls muted loop playsinline preload="metadata" poster="assets/video_poster_online.jpg"
-             style="aspect-ratio:968/608" src="assets/flythrough_online_A3.mp4"></video>
-      <span class="badge" style="top:14px;bottom:auto"><i></i>在线建图结果 · 28.8 秒</span>
-    </div>
-    <p class="cap">170 帧视频在线建出的地图本体，直接漫游。</p>
-  </section>
-
-  <section id="conclusion">
-    <div class="sec-head reveal"><span class="sec-no">03</span>
-      <h2>总结</h2>
-      <p class="sec-sub">三句话。</p></div>
-    <div class="card reveal">
-      <p>① <b>多快？</b>170 帧水下视频，698 秒出第一张可用地图。</p>
-      <p>② <b>怎么做？</b>DIRECT 深度同时做初始化、米制、压缩，免离线 COLMAP、免真值。</p>
-      <p>③ <b>效果？</b>对比离线 SfM：画质 +4 dB、地图小 8.6%、自带米制；锐度略低。</p>
-    </div>
   </section>
 
 </div></main>
