@@ -173,10 +173,10 @@
   <div class="kicker">项目展示</div>
   <h1>水下 3D 高斯泼溅建图<br><span class="grad">Time-to-Map</span></h1>
   <p class="lede">把水下视频变成可用的 3D 地图，<b>越快越好</b>。Time-to-Map 就是「从视频到第一张够清楚的地图」要多久：
-     不跑离线 COLMAP，浑水里边采边建。</p>
+     不跑离线 COLMAP，不用等拍完，采集过程中就在建图。</p>
 
   <div class="stats">
-    <div class="stat"><b>698 秒</b><span>首张高质量地图<br>170 帧水下视频</span></div>
+    <div class="stat"><b>698 秒</b><span>从开始到首张达标地图<br>170 帧子集</span></div>
     <div class="stat"><b>PSNR +4 dB</b><span>画质 vs 离线 SfM<br>31.66 vs 27.57</span></div>
     <div class="stat"><b>地图小 8.6%</b><span>83 万 vs 91 万高斯</span></div>
     <div class="stat"><b>清晰度 10.56</b><span>在线建图<br>离线 SfM 12.61</span></div>
@@ -212,14 +212,14 @@
       <p class="sec-sub">同一段 1017 帧水下视频，我们的在线方案 vs 离线 SfM。</p></div>
     <table class="reveal">
       <tr><th class="l">对比项</th><th>我们的在线方案</th><th>离线 SfM</th></tr>
-      <tr><td class="l">首张达标地图</td><td class="ok"><b>698 秒</b>（边采边建）</td>
+      <tr><td class="l">首张达标地图</td><td class="ok"><b>698 秒</b></td>
           <td>采完再跑 COLMAP 数小时，再训练 20 分钟</td></tr>
       <tr><td class="l">画质 PSNR</td><td class="ok"><b>31.66</b></td><td>27.57</td></tr>
       <tr><td class="l">清晰度 Lap</td><td><b>10.56</b></td><td><b>12.61</b></td></tr>
       <tr><td class="l">地图大小</td><td class="ok"><b>83 万高斯</b></td><td>91 万高斯</td></tr>
     </table>
     <p class="cap">画质 +4 dB、地图小 8.6%、自带米制；锐度低约 2 分，但首图快了几个小时。</p>
-    <p class="cap dim">口径：698 秒为 170 帧在线子集；画质与地图为 1017 帧全序列。</p>
+    <p class="cap dim">口径：698 秒指 170 帧子集从开始建图到首张达标地图的时间；画质与地图为 1017 帧全序列。</p>
 
   </section>
 
