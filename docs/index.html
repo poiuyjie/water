@@ -166,111 +166,78 @@
 
 <nav><div class="wrap">
   <span class="brand">water<b>·</b>Time-to-Map</span>
-  <a href="#goal">项目目标</a><a href="#dual">系统做法</a><a href="#ladder">主结果</a><a href="#ledger">对比</a><a href="#conclusion">总结</a>
+  <a href="#dual">系统做法</a><a href="#result">主结果</a><a href="#conclusion">总结</a>
 </div></nav>
 
 <header class="hero"><div class="wrap">
   <div class="kicker">项目展示</div>
   <h1>水下 3D 高斯泼溅建图<br><span class="grad">Time-to-Map</span></h1>
-  <p class="lede">把水下视频变成可用的 3D 地图，<b>越快越好</b>。
-     免离线 COLMAP，浑水边采集边建图。</p>
+  <p class="lede">把水下视频变成可用的 3D 地图，<b>越快越好</b>。Time-to-Map 就是「从视频到第一张够清楚的地图」要多久：
+     不跑离线 COLMAP，浑水里边采边建。</p>
 
   <div class="stats">
-    <div class="stat"><b>698 秒</b><span>首张高质量地图耗时<br>（170 帧水下视频）</span></div>
-    <div class="stat"><b class="long">0.04 → 0.24 → 0.34</b><span>训练步数越多，画面越清晰<br>（锐度从糊到清楚）</span></div>
-    <div class="stat"><b>PSNR +4 dB</b><span>我们的画质 vs 离线 SfM<br>31.66 vs 27.57</span></div>
-    <div class="stat"><b>地图小 8.6%</b><span>我们 vs 离线 SfM<br>83 万 vs 91 万高斯</span></div>
-    <div class="stat"><b>锐度稍逊</b><span>我们 vs 离线 SfM<br>10.56 vs 12.61</span></div>
+    <div class="stat"><b>698 秒</b><span>首张高质量地图<br>170 帧水下视频</span></div>
+    <div class="stat"><b>PSNR +4 dB</b><span>画质 vs 离线 SfM<br>31.66 vs 27.57</span></div>
+    <div class="stat"><b>地图小 8.6%</b><span>83 万 vs 91 万高斯</span></div>
+    <div class="stat"><b>清晰度 10.56</b><span>在线建图<br>离线 SfM 12.61</span></div>
   </div>
 
   <div class="screen">
     <video id="heroVideo" autoplay muted loop playsinline preload="auto" disablepictureinpicture
            poster="assets/video_poster.jpg?v=3" src="assets/flythrough_fullseq.mp4?v=1"></video>
-    <span class="badge"><i></i>整段水下采集视频 · 1017 帧 · 点击暂停/播放</span>
+    <span class="badge"><i></i>GT vs Ours · 1017 帧 · 点击暂停/播放</span>
   </div>
-  <p class="cap">上面是整段水下采集的视频 · <a href="#ledger">看下面我们的方案跟离线 SfM 比怎么样</a></p>
+  <p class="cap">左：GT；右：我们的重建 · <a href="#result">下面是 698 秒建出来的地图</a></p>
 </div></header>
 
 <main><div class="wrap">
 
-  <!-- ================ 01 ================ -->
-  <section id="goal">
-    <div class="sec-head reveal"><span class="sec-no">01</span>
-      <h2>项目目标</h2>
-      <p class="sec-sub">把"建图多快算快"变成一个可衡量的指标。</p></div>
-    <div class="card reveal">
-      <p><b>水下视频能不能不依赖离线 COLMAP，在可接受时间内建成质量达标的 3D 地图？瓶颈在哪？</b></p>
-      <p>把这问题变成一个数字：<b>Time-to-Map</b> —— 从水下视频到第一张"够清楚"地图要多久。
-      衡量的标准是 <b>画质足够 + 画面不糊</b>。这个项目就是看怎么把 Time-to-Map 压到最短。</p>
-    </div>
-  </section>
-
-  <!-- ================ 02 ================ -->
   <section id="dual">
-    <div class="sec-head reveal"><span class="sec-no">02</span>
+    <div class="sec-head reveal"><span class="sec-no">01</span>
       <h2>系统做法</h2>
-      <p class="sec-sub">用 DIRECT 模型（一个深度模型）做了三件事。</p></div>
+      <p class="sec-sub">一个深度模型 DIRECT，做三件事。</p></div>
     <div class="grid2">
       <div class="use reveal"><span class="tag">D · 深度</span><b class="t">初始化</b>
         <p>每帧估出来的深度，直接反投影成 3D 点凑成初始点云。<b>不用离线 COLMAP</b>，浑水起步就靠它。</p></div>
       <div class="use reveal"><span class="tag">D · 深度</span><b class="t">自动算米制</b>
-        <p>用深度反推实际米制，不需要任何真值标注。轨迹自带<b>绝对尺度</b>，离线 SfM 都做不到。</p></div>
+        <p>用深度反推实际米制，不需要任何真值标注。轨迹自带<b>绝对尺度</b>。</p></div>
       <div class="use reveal"><span class="tag">D · 深度</span><b class="t">压缩地图</b>
-        <p>用"深度多次对得上"的位置当高可信区，把算力集中过去。<b>地图小 20%，画质不变</b>。</p></div>
+        <p>用「深度多次对得上」的位置当高可信区，把算力集中过去。<b>地图小 20%，画质不变</b>。</p></div>
     </div>
   </section>
 
-  <!-- ================ 04 ================ -->
-  <section id="ladder">
-    <div class="sec-head reveal"><span class="sec-no">03</span>
-      <h2>主结果：我们的方案 vs 离线 SfM</h2>
-      <p class="sec-sub">同一段水下珊瑚采集视频（1017 帧）上的对比。</p></div>
+  <section id="result">
+    <div class="sec-head reveal"><span class="sec-no">02</span>
+      <h2>主结果</h2>
+      <p class="sec-sub">同一段 1017 帧水下视频，我们的在线方案 vs 离线 SfM。</p></div>
     <table class="reveal">
-      <tr><th class="l">方案</th><th>画质（PSNR）</th><th>清晰度</th><th>地图大小</th></tr>
-      <tr class="hl"><td class="l"><b>我们的方案（在线，150k 步）</b></td><td><b>31.66</b></td><td><b>10.56</b></td><td><b>83 万高斯</b></td></tr>
-      <tr><td class="l">离线 SfM（COLMAP 全量后再训练）</td><td>27.57</td><td>12.61</td><td>91 万高斯</td></tr>
+      <tr><th class="l">对比项</th><th>我们的在线方案</th><th>离线 SfM</th></tr>
+      <tr><td class="l">首张达标地图</td><td class="ok"><b>698 秒</b>（边采边建）</td>
+          <td>采完再跑 COLMAP 数小时，再训练 20 分钟</td></tr>
+      <tr><td class="l">画质 PSNR</td><td class="ok"><b>31.66</b></td><td>27.57</td></tr>
+      <tr><td class="l">清晰度 Lap</td><td><b>10.56</b></td><td><b>12.61</b></td></tr>
+      <tr><td class="l">地图大小</td><td class="ok"><b>83 万高斯</b></td><td>91 万高斯</td></tr>
     </table>
+    <p class="cap">画质 +4 dB、地图小 8.6%、自带米制；锐度低约 2 分，但首图快了几个小时。</p>
+    <p class="cap dim">口径：698 秒为 170 帧在线子集；画质与地图为 1017 帧全序列。</p>
+
+    <h3>698 秒建出来的地图</h3>
+    <div class="screen reveal">
+      <video controls muted loop playsinline preload="metadata" poster="assets/video_poster_online.jpg"
+             style="aspect-ratio:968/608" src="assets/flythrough_online_A3.mp4"></video>
+      <span class="badge" style="top:14px;bottom:auto"><i></i>在线建图结果 · 28.8 秒</span>
+    </div>
+    <p class="cap">170 帧视频在线建出的地图本体，直接漫游。</p>
   </section>
 
-  <!-- ================ 05 ================ -->
-  <!-- ================ 07 ================ -->
-  <section id="ledger">
-    <div class="sec-head reveal"><span class="sec-no">04</span>
-      <h2>我们的方案到底赢在哪</h2>
-      <p class="sec-sub">跟离线 SfM 比，我们各有胜负。</p></div>
-    <table class="reveal">
-      <tr><th class="l" style="width:24%">对比项</th><th class="l">我们的在线方案</th><th class="l">离线 SfM</th></tr>
-      <tr><td class="l">首张达标地图耗时</td><td class="ok"><b>698 秒</b>（边采集边出图）</td>
-          <td>需要先把所有数据采完，COLMAP 跑几小时 + 再训练 20 分钟</td></tr>
-      <tr><td class="l">画面画质（PSNR）</td><td>31.66</td>
-          <td>27.57</td></tr>
-      <tr><td class="l">画面清晰度</td><td>10.56</td>
-          <td class="ok"><b>12.61</b>（它锐度略高）</td></tr>
-      <tr><td class="l">地图大小</td><td class="ok"><b>83 万高斯</b>（小 8.6%）</td><td>91 万高斯</td></tr>
-      <tr><td class="l">绝对尺度（米制）</td><td class="ok"><b>✅ 自动算出</b></td>
-          <td class="bad">❌ 没有，需要真值</td></tr>
-      <tr><td class="l">浑水鲁棒性</td><td class="ok"><b>✅ 免 SfM</b>，不依赖特征点</td>
-          <td class="bad">浑水特征点难匹配，容易跑飞</td></tr>
-      <tr><td class="l">预算灵活度</td><td class="ok"><b>随时停</b>，想画多清楚都行</td><td>必须跑完全部训练</td></tr>
-    </table>
-    <p><b>一句话总结</b>：我们画质更好、地图更小、自带米制、对浑水更稳；唯一略输的是锐度，
-    但跑得快、不用离线预处理。</p>
-    <figure class="reveal">
-      <img src="assets/cmp_ladder_zoom.jpg" alt="公开数据集 SeaThruNeRF 上的配方对比">
-      <figcaption>配方也能搬到清水公开数据集 SeaThruNeRF 上，5 档对比里画质/SSIM/LPIPS 三项都是最优。</figcaption>
-    </figure>
-  </section>
-
-  <!-- ================ 08 ================ -->
   <section id="conclusion">
-    <div class="sec-head reveal"><span class="sec-no">05</span>
+    <div class="sec-head reveal"><span class="sec-no">03</span>
       <h2>总结</h2>
-      <p class="sec-sub">三句话讲完这个项目做了什么。</p></div>
+      <p class="sec-sub">三句话。</p></div>
     <div class="card reveal">
-      <p>① <b>水下视频 → 可用 3D 地图要多久？</b>答案是 698 秒（170 帧，约 12 分钟）。</p>
-      <p>② <b>怎么做到的？</b>用 DIRECT 模型同时做初始化、算米制、压地图三件事，加上边采集边训练的策略。
-      不用离线 COLMAP，不用真值标注，浑水也能跑。</p>
-      <p>③ <b>跟离线 SfM 比怎么样？</b>画质更高、地图更小、自带米制、对浑水更稳；只有画面清晰度略输一点点。</p>
+      <p>① <b>多快？</b>170 帧水下视频，698 秒出第一张可用地图。</p>
+      <p>② <b>怎么做？</b>DIRECT 深度同时做初始化、米制、压缩，免离线 COLMAP、免真值。</p>
+      <p>③ <b>效果？</b>对比离线 SfM：画质 +4 dB、地图小 8.6%、自带米制；锐度略低。</p>
     </div>
   </section>
 
